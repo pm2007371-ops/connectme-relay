@@ -7,46 +7,39 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-// Estado de dispositivos conectados
-const devices = new Map(); // deviceId → ws
-const panels  = new Set(); // PCs controladores
-
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(express.json());
 
-// API para obtener dispositivos activos
-app.get('/api/devices', (req, res) => {
-    const list = Array.from(devices.keys()).map(id => ({
-        id,
-        connected: devices.get(id).readyState === 1
-    }));
-    res.json(list);
-});
+const devices = new Map(); // deviceId → ws
+const panels  = new Set();
 
-wss.on('connection', (ws, req) => {
+wss.on('connection', (ws) => {
     let deviceId = null;
-    let role = null; // 'device' o 'panel'
+    let role = null;
+    ws.isAlive = true;
+    ws.on('pong', () => { ws.isAlive = true; });
 
-    ws.on('message', (data) => {
+    ws.on('message', (data, isBinary) => {
+        // Frame binario (JPEG) del dispositivo → reenviar a paneles
+        if (isBinary) {
+            panels.forEach(p => { if (p.readyState === 1) p.send(data, { binary: true }); });
+            return;
+        }
+
         try {
             const msg = JSON.parse(data.toString());
 
-            // Registro inicial
             if (msg.type === 'register') {
-                role     = msg.role;     // 'device' o 'panel'
-                deviceId = msg.deviceId || 'default';
-
+                role     = msg.role;
+                deviceId = msg.deviceId || 'device1';
                 if (role === 'device') {
                     devices.set(deviceId, ws);
-                    console.log(`📱 Dispositivo conectado: ${deviceId}`);
-                    // Notificar a todos los paneles
-                    broadcast(panels, JSON.stringify({
+                    console.log(`📱 Dispositivo: ${deviceId}`);
+                    panels.forEach(p => p.readyState === 1 && p.send(JSON.stringify({
                         type: 'device_connected', deviceId
-                    }));
-                } else if (role === 'panel') {
+                    })));
+                } else {
                     panels.add(ws);
                     console.log('💻 Panel conectado');
-                    // Enviar lista de dispositivos activos
                     ws.send(JSON.stringify({
                         type: 'device_list',
                         devices: Array.from(devices.keys())
@@ -55,58 +48,42 @@ wss.on('connection', (ws, req) => {
                 return;
             }
 
-            // Reenviar datos del dispositivo → panel
-            if (role === 'device') {
-                broadcast(panels, data.toString());
-                return;
-            }
-
-            // Reenviar comandos del panel → dispositivo
+            // Panel → dispositivo (comandos)
             if (role === 'panel') {
                 const target = msg.deviceId || Array.from(devices.keys())[0];
                 const dev = devices.get(target);
-                if (dev?.readyState === 1) {
-                    dev.send(data.toString());
-                }
+                if (dev?.readyState === 1) dev.send(JSON.stringify(msg));
+                return;
             }
 
-        } catch(e) {
-            // Datos binarios (frames de cámara/pantalla) → reenviar a paneles
+            // Dispositivo → paneles (datos JSON: archivos, info, etc.)
             if (role === 'device') {
-                panels.forEach(p => {
-                    if (p.readyState === 1) p.send(data);
-                });
+                panels.forEach(p => { if (p.readyState === 1) p.send(JSON.stringify(msg)); });
             }
-        }
+
+        } catch(e) {}
     });
 
     ws.on('close', () => {
         if (role === 'device' && deviceId) {
             devices.delete(deviceId);
-            console.log(`📱 Dispositivo desconectado: ${deviceId}`);
-            broadcast(panels, JSON.stringify({ type: 'device_disconnected', deviceId }));
+            panels.forEach(p => p.readyState === 1 && p.send(JSON.stringify({
+                type: 'device_disconnected', deviceId
+            })));
         } else if (role === 'panel') {
             panels.delete(ws);
         }
     });
-
-    // Keepalive
-    ws.isAlive = true;
-    ws.on('pong', () => { ws.isAlive = true; });
 });
 
-// Ping cada 30s para mantener conexiones vivas
+// Keepalive
 setInterval(() => {
     wss.clients.forEach(ws => {
-        if (!ws.isAlive) { ws.terminate(); return; }
+        if (!ws.isAlive) return ws.terminate();
         ws.isAlive = false;
         ws.ping();
     });
-}, 30_000);
-
-function broadcast(clients, msg) {
-    clients.forEach(c => { if (c.readyState === 1) c.send(msg); });
-}
+}, 25000);
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => console.log(`✅ ConnectMe Relay en puerto ${PORT}`));
+server.listen(PORT, () => console.log(`✅ ConnectMe Relay :${PORT}`));
