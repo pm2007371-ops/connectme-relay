@@ -9,7 +9,10 @@ const wss = new WebSocketServer({ server });
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-const devices = new Map(); // deviceId → ws
+// Health check — Render lo usa para saber si el servicio está vivo
+app.get('/health', (req, res) => res.json({ ok: true, devices: devices.size }));
+
+const devices = new Map();
 const panels  = new Set();
 
 wss.on('connection', (ws) => {
@@ -19,12 +22,11 @@ wss.on('connection', (ws) => {
     ws.on('pong', () => { ws.isAlive = true; });
 
     ws.on('message', (data, isBinary) => {
-        // Frame binario (JPEG) del dispositivo → reenviar a paneles
+        // Frame binario (imagen/audio) — reenviar a paneles directamente
         if (isBinary) {
             panels.forEach(p => { if (p.readyState === 1) p.send(data, { binary: true }); });
             return;
         }
-
         try {
             const msg = JSON.parse(data.toString());
 
@@ -56,7 +58,7 @@ wss.on('connection', (ws) => {
                 return;
             }
 
-            // Dispositivo → paneles (datos JSON: archivos, info, etc.)
+            // Dispositivo → paneles (datos JSON: archivos, info, galería...)
             if (role === 'device') {
                 panels.forEach(p => { if (p.readyState === 1) p.send(JSON.stringify(msg)); });
             }
@@ -76,14 +78,23 @@ wss.on('connection', (ws) => {
     });
 });
 
-// Keepalive
+// Keepalive — evita que Render duerma el servicio y mantiene conexiones vivas
+const PING_INTERVAL = 20_000; // cada 20s
 setInterval(() => {
     wss.clients.forEach(ws => {
-        if (!ws.isAlive) return ws.terminate();
+        if (!ws.isAlive) { ws.terminate(); return; }
         ws.isAlive = false;
         ws.ping();
     });
-}, 25000);
+}, PING_INTERVAL);
+
+// Auto-ping propio para evitar el sleep de Render (cada 10 min)
+const SELF_URL = process.env.RENDER_EXTERNAL_URL;
+if (SELF_URL) {
+    setInterval(() => {
+        require('https').get(`${SELF_URL}/health`, () => {}).on('error', () => {});
+    }, 10 * 60 * 1000);
+}
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`✅ ConnectMe Relay :${PORT}`));
