@@ -34,8 +34,8 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
 .files{flex:1;overflow-y:auto;padding:8px}
 .file{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer}
 .file:hover{background:#1a1629}
-.thumb{width:44px;height:44px;object-fit:cover;border-radius:5px;flex-shrink:0;background:#1E1B2E}
-.ficon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.thumb{width:64px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#1E1B2E}
+.ficon{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
 .finfo{flex:1;min-width:0} .fname{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .fsize{font-size:10px;color:#8B949E;margin-top:2px}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;overflow-y:auto}
 .card{background:#110D1E;border:1px solid #2D2A3E;border-radius:10px;padding:12px}
@@ -263,7 +263,7 @@ function showTab(name) {
 function setRS(on){const e=document.getElementById('relayStatus');e.textContent=on?'● Conectado':'● Desconectado';e.className='rs '+(on?'on':'off');}
 function icon(n){if(/\.(mp4|mov|avi|mkv)$/i.test(n))return'🎬';if(/\.(mp3|aac|wav)$/i.test(n))return'🎵';if(/\.pdf$/i.test(n))return'📄';if(/\.apk$/i.test(n))return'📦';return'📄';}
 function fmt(b){if(!b)return'';if(b>1e9)return(b/1e9).toFixed(1)+'GB';if(b>1e6)return(b/1e6).toFixed(1)+'MB';if(b>1e3)return(b/1e3).toFixed(0)+'KB';return b+'B';}
-function btoa(s){try{return window.btoa(unescape(encodeURIComponent(s)))}catch(e){return s.slice(-12)}}
+function btoa(s){try{return window.btoa(unescape(encodeURIComponent(s)))}catch(e){return Math.abs(s.split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,0)).toString(36)}}
 
 connect();
 </script>
