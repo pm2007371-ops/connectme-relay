@@ -7,86 +7,53 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{background:#0A0714;color:#fff;font-family:-apple-system,sans-serif;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-
-/* Header */
 .header{background:#110D1E;padding:10px 20px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #2D2A3E;flex-shrink:0}
-.logo{font-size:22px}
-h1{font-size:16px;font-weight:700}
-.relay-status{font-size:11px;padding:3px 10px;border-radius:12px}
-.relay-status.on{background:#0d2818;color:#30D158}
-.relay-status.off{background:#2d0a0a;color:#EF4444}
-
-/* Selector de dispositivos */
-.devices-bar{background:#0D1117;padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #2D2A3E;flex-shrink:0;overflow-x:auto}
-.devices-label{font-size:11px;color:#8B949E;white-space:nowrap;margin-right:4px}
-.dev-card{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 14px;border-radius:10px;border:2px solid #2D2A3E;cursor:pointer;min-width:90px;transition:.2s;background:#110D1E}
-.dev-card:hover{border-color:#7C3AED}
-.dev-card.active{border-color:#7C3AED;background:#1a1040}
-.dev-card.offline{opacity:.4}
-.dev-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
-.dev-name{font-size:11px;color:#E6EDF3;font-weight:600}
-.dev-ping{font-size:10px}
-.dev-ping.on{color:#30D158}
-.dev-ping.off{color:#EF4444}
-.no-devices{font-size:12px;color:#4B5563;padding:8px}
-
-/* Layout principal */
+.logo{font-size:22px} h1{font-size:16px;font-weight:700}
+.rs{font-size:11px;padding:3px 10px;border-radius:12px}
+.rs.on{background:#0d2818;color:#30D158} .rs.off{background:#2d0a0a;color:#EF4444}
+.dbar{background:#0D1117;padding:8px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #2D2A3E;flex-shrink:0;overflow-x:auto}
+.dlabel{font-size:11px;color:#8B949E;white-space:nowrap;margin-right:4px}
+.dcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 12px;border-radius:10px;border:2px solid #2D2A3E;cursor:pointer;min-width:80px;background:#110D1E;transition:.2s}
+.dcard:hover{border-color:#7C3AED} .dcard.active{border-color:#7C3AED;background:#1a1040} .dcard.offline{opacity:.4}
+.davatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700}
+.dname{font-size:10px;color:#E6EDF3;font-weight:600} .dping{font-size:9px}
+.dping.on{color:#30D158} .dping.off{color:#EF4444}
 .main{display:flex;flex:1;overflow:hidden}
-.sidebar{width:150px;background:#110D1E;border-right:1px solid #2D2A3E;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar{width:140px;background:#110D1E;border-right:1px solid #2D2A3E;display:flex;flex-direction:column;flex-shrink:0}
 .tab{padding:11px 14px;cursor:pointer;font-size:13px;color:#8B949E;border-left:3px solid transparent}
-.tab:hover{color:#fff;background:#1a1629}
-.tab.active{color:#fff;border-left-color:#7C3AED;background:#1a1629}
+.tab:hover{color:#fff;background:#1a1629} .tab.active{color:#fff;border-left-color:#7C3AED;background:#1a1629}
 .content{flex:1;overflow:hidden;display:flex;flex-direction:column}
-.panel{display:none;flex:1;flex-direction:column;overflow:hidden}
-.panel.active{display:flex}
-
-/* Stream */
-.stream-area{flex:1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden}
-.stream-area img{max-width:100%;max-height:100%;object-fit:contain;display:block}
-.no-signal{color:#333;font-size:13px;text-align:center;line-height:2}
-
-/* Controls */
-.controls{background:#110D1E;padding:8px 14px;display:flex;gap:6px;border-top:1px solid #2D2A3E;flex-shrink:0;flex-wrap:wrap}
+.panel{display:none;flex:1;flex-direction:column;overflow:hidden} .panel.active{display:flex}
+.stream{flex:1;background:#000;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.stream img{max-width:100%;max-height:100%;object-fit:contain;display:block}
+.nosig{color:#444;font-size:12px;text-align:center;line-height:2.2}
+.ctrl{background:#110D1E;padding:8px 12px;display:flex;gap:6px;border-top:1px solid #2D2A3E;flex-shrink:0;flex-wrap:wrap}
 .btn{background:#1E1B2E;border:1px solid #3D3A4E;color:#fff;padding:6px 12px;border-radius:7px;cursor:pointer;font-size:12px;white-space:nowrap}
-.btn:hover{background:#2D2A3E}
-.btn.g{background:#16a34a;border-color:#16a34a}
-.btn.r{background:#DC2626;border-color:#DC2626}
-.btn.p{background:#7C3AED;border-color:#7C3AED}
-
-/* Archivos */
-.files{flex:1;overflow-y:auto;padding:4px 8px}
-.file{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;cursor:pointer}
+.btn:hover{background:#2D2A3E} .btn.g{background:#16a34a;border-color:#16a34a} .btn.r{background:#DC2626;border-color:#DC2626} .btn.p{background:#7C3AED;border-color:#7C3AED}
+/* Archivos con miniaturas */
+.files{flex:1;overflow-y:auto;padding:8px}
+.file{display:flex;align-items:center;gap:10px;padding:7px 10px;border-radius:6px;cursor:pointer}
 .file:hover{background:#1a1629}
-.fname{flex:1;font-size:13px;word-break:break-all}
-.fsize{font-size:10px;color:#8B949E;white-space:nowrap}
-
-/* Info */
+.thumb{width:44px;height:44px;object-fit:cover;border-radius:5px;flex-shrink:0;background:#1E1B2E}
+.ficon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0}
+.finfo{flex:1;min-width:0} .fname{font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap} .fsize{font-size:10px;color:#8B949E;margin-top:2px}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:16px;overflow-y:auto}
 .card{background:#110D1E;border:1px solid #2D2A3E;border-radius:10px;padding:12px}
-.clabel{font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px}
-.cval{font-size:14px;font-weight:600}
-
+.clabel{font-size:10px;color:#8B949E;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px} .cval{font-size:14px;font-weight:600}
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:#8B949E;font-size:13px}
 </style>
 </head>
 <body>
-
-<!-- Header -->
 <div class="header">
-  <div class="logo">∞</div>
-  <h1>ConnectMe</h1>
-  <span class="relay-status off" id="relayStatus">Desconectado</span>
+  <div class="logo">∞</div><h1>ConnectMe</h1>
+  <span class="rs off" id="relayStatus">Desconectado</span>
 </div>
-
-<!-- Selector de dispositivos -->
-<div class="devices-bar">
-  <span class="devices-label">📱 Dispositivos:</span>
+<div class="dbar">
+  <span class="dlabel">📱 Dispositivos:</span>
   <div id="devCards" style="display:flex;gap:8px">
-    <span class="no-devices">Esperando dispositivos...</span>
+    <span style="font-size:12px;color:#4B5563">Esperando...</span>
   </div>
 </div>
-
-<!-- Main -->
 <div class="main">
   <div class="sidebar">
     <div class="tab active" onclick="showTab('screen')">🖥️ Pantalla</div>
@@ -94,233 +61,209 @@ h1{font-size:16px;font-weight:700}
     <div class="tab" onclick="showTab('files')">📁 Archivos</div>
     <div class="tab" onclick="showTab('info')">📱 Info</div>
   </div>
-
   <div class="content">
-    <!-- Pantalla -->
+    <!-- Pantalla — solo recibe frames con prefijo S: -->
     <div class="panel active" id="panelScreen">
-      <div class="stream-area" id="screenArea">
-        <div class="no-signal">🖥️<br>Selecciona un dispositivo<br>y pulsa ▶ Iniciar</div>
-      </div>
-      <div class="controls">
+      <div class="stream" id="screenArea"><div class="nosig">🖥️<br>Selecciona dispositivo<br>y pulsa ▶ Iniciar</div></div>
+      <div class="ctrl">
         <button class="btn g" onclick="startStream('screen')">▶ Iniciar</button>
         <button class="btn r" onclick="stopStream('screen')">⏹ Detener</button>
-        <button class="btn" onclick="cmd('home')">⌂</button>
-        <button class="btn" onclick="cmd('back')">←</button>
-        <button class="btn" onclick="cmd('recents')">▣</button>
+        <button class="btn" onclick="cmd('home')">⌂ Inicio</button>
+        <button class="btn" onclick="cmd('back')">← Atrás</button>
+        <button class="btn" onclick="cmd('recents')">▣ Recientes</button>
       </div>
     </div>
-
-    <!-- Cámara -->
+    <!-- Cámara — solo recibe frames con prefijo C: -->
     <div class="panel" id="panelCamera">
-      <div class="stream-area" id="cameraArea">
-        <div class="no-signal">📷<br>Selecciona un dispositivo<br>y elige la cámara</div>
-      </div>
-      <div class="controls">
+      <div class="stream" id="cameraArea"><div class="nosig">📷<br>Selecciona dispositivo<br>y elige la cámara</div></div>
+      <div class="ctrl">
         <button class="btn g" onclick="startStream('cam_front')">📱 Frontal</button>
         <button class="btn g" onclick="startStream('cam_back')">📸 Trasera</button>
         <button class="btn r" onclick="stopStream('camera')">⏹ Detener</button>
       </div>
     </div>
-
-    <!-- Archivos -->
+    <!-- Archivos con miniaturas -->
     <div class="panel" id="panelFiles">
-      <div class="controls">
+      <div class="ctrl">
         <button class="btn" onclick="listFiles('/sdcard')">📱 Interno</button>
         <button class="btn" onclick="listFiles('/sdcard/DCIM')">📷 DCIM</button>
         <button class="btn" onclick="listFiles('/sdcard/Download')">⬇️ Descargas</button>
         <button class="btn" onclick="listFiles('/sdcard/WhatsApp/Media')">💬 WhatsApp</button>
         <button class="btn" onclick="listFiles('/')">/ Raíz</button>
       </div>
-      <div class="files" id="fileList">
-        <div class="empty"><span style="font-size:36px">📁</span>Selecciona una carpeta</div>
-      </div>
+      <div class="files" id="fileList"><div class="empty"><span style="font-size:36px">📁</span>Selecciona una carpeta</div></div>
     </div>
-
     <!-- Info -->
     <div class="panel" id="panelInfo">
-      <div class="controls">
-        <button class="btn p" onclick="cmd('info')">🔄 Actualizar</button>
-      </div>
-      <div class="info-grid" id="infoGrid">
-        <div class="empty" style="grid-column:1/-1"><span style="font-size:36px">📱</span>Pulsa Actualizar</div>
-      </div>
+      <div class="ctrl"><button class="btn p" onclick="cmd('info')">🔄 Actualizar</button></div>
+      <div class="info-grid" id="infoGrid"><div class="empty" style="grid-column:1/-1"><span style="font-size:36px">📱</span>Pulsa Actualizar</div></div>
     </div>
   </div>
 </div>
 
 <script>
-// Estado
 let ws;
-const devices = {};   // deviceId → { name, online, color }
+const devices = {};
 let activeDevice = null;
 let screenInt = null, camInt = null;
-
 const COLORS = ['#7C3AED','#0EA5E9','#16a34a','#DC2626','#f59e0b','#ec4899'];
 let colorIdx = 0;
+// URLs de miniaturas generadas localmente
+const thumbUrls = {};
 
-// ── WebSocket ────────────────────────────────────────────────────────────────
 function connect() {
-  const proto = location.protocol === 'https:' ? 'wss:' : 'ws:';
+  const proto = location.protocol==='https:'?'wss:':'ws:';
   ws = new WebSocket(`${proto}//${location.host}`);
   ws.binaryType = 'arraybuffer';
-
-  ws.onopen = () => {
-    setRelayStatus(true);
-    ws.send(JSON.stringify({ type:'register', role:'panel' }));
-  };
-  ws.onclose = () => { setRelayStatus(false); setTimeout(connect, 3000); };
-
+  ws.onopen = () => { setRS(true); ws.send(JSON.stringify({type:'register',role:'panel'})); };
+  ws.onclose = () => { setRS(false); setTimeout(connect,3000); };
   ws.onmessage = (e) => {
-    // Frame binario → mostrar en panel activo
     if (e.data instanceof ArrayBuffer) {
-      const blob = new Blob([e.data], { type:'image/jpeg' });
-      const url  = URL.createObjectURL(blob);
-      const area = document.querySelector('.panel.active .stream-area');
-      if (!area) return;
-      let img = area.querySelector('img');
-      if (!img) { area.innerHTML=''; img=document.createElement('img'); area.appendChild(img); }
-      URL.revokeObjectURL(img.src); img.src = url;
+      handleBinary(e.data);
       return;
     }
     try {
       const msg = JSON.parse(e.data);
-      if (msg.type === 'device_list')         msg.devices.forEach(id => addDevice(id));
-      if (msg.type === 'device_connected')    addDevice(msg.deviceId);
-      if (msg.type === 'device_disconnected') setDeviceOffline(msg.deviceId);
-      if (msg.type === 'files')  renderFiles(msg.data);
-      if (msg.type === 'info')   renderInfo(msg.data);
-    } catch(e) {}
+      if (msg.type==='device_list')         msg.devices.forEach(id=>addDevice(id));
+      if (msg.type==='device_connected')    addDevice(msg.deviceId);
+      if (msg.type==='device_disconnected') setOffline(msg.deviceId);
+      if (msg.type==='files') renderFiles(msg.data);
+      if (msg.type==='info')  renderInfo(msg.data);
+      if (msg.type==='thumb') renderThumb(msg.path, msg.data);
+    } catch(e){}
   };
 }
 
-// ── Dispositivos ──────────────────────────────────────────────────────────────
-function addDevice(id) {
-  if (!id) return;
-  if (!devices[id]) {
-    devices[id] = { color: COLORS[colorIdx++ % COLORS.length], online: true };
-  } else {
-    devices[id].online = true;
-  }
-  if (!activeDevice) selectDevice(id);
-  renderDeviceBar();
+function handleBinary(buf) {
+  // Leer prefijo: primeros 2 bytes = "S:" pantalla o "C:" cámara
+  const view = new Uint8Array(buf);
+  const prefix = String.fromCharCode(view[0], view[1]);
+  const frameData = buf.slice(2); // datos JPEG sin prefijo
+  const blob = new Blob([frameData], {type:'image/jpeg'});
+  const url  = URL.createObjectURL(blob);
+
+  let areaId = null;
+  if (prefix === 'S:') areaId = 'screenArea';
+  if (prefix === 'C:') areaId = 'cameraArea';
+  if (!areaId) return;
+
+  const area = document.getElementById(areaId);
+  if (!area) return;
+  let img = area.querySelector('img');
+  if (!img) { area.innerHTML=''; img=document.createElement('img'); area.appendChild(img); }
+  URL.revokeObjectURL(img.src);
+  img.src = url;
 }
 
-function setDeviceOffline(id) {
-  if (devices[id]) { devices[id].online = false; renderDeviceBar(); }
-  if (activeDevice === id) stopAllStreams();
-}
-
-function selectDevice(id) {
-  activeDevice = id;
-  stopAllStreams();
-  renderDeviceBar();
-  // Resetear áreas
-  document.getElementById('screenArea').innerHTML = '<div class="no-signal">🖥️<br>Pulsa ▶ Iniciar</div>';
-  document.getElementById('cameraArea').innerHTML = '<div class="no-signal">📷<br>Elige la cámara</div>';
-}
-
-function renderDeviceBar() {
-  const container = document.getElementById('devCards');
-  const ids = Object.keys(devices);
-  if (!ids.length) {
-    container.innerHTML = '<span class="no-devices">Esperando dispositivos...</span>';
-    return;
-  }
-  container.innerHTML = ids.map(id => {
-    const d = devices[id];
-    const isActive = id === activeDevice;
-    return `
-      <div class="dev-card ${isActive?'active':''} ${d.online?'':'offline'}"
-           onclick="selectDevice('${id}')">
-        <div class="dev-avatar" style="background:${d.color}">${id.slice(0,2).toUpperCase()}</div>
-        <div class="dev-name">${id.slice(0,8)}</div>
-        <div class="dev-ping ${d.online?'on':'off'}">${d.online?'● Online':'● Offline'}</div>
-      </div>`;
-  }).join('');
-}
-
-// ── Comandos ──────────────────────────────────────────────────────────────────
 function cmd(action, extra={}) {
-  if (!ws || ws.readyState !== 1) return;
-  if (!activeDevice) { alert('Selecciona un dispositivo primero'); return; }
-  ws.send(JSON.stringify({ type:'cmd', action, deviceId:activeDevice, ...extra }));
+  if (!ws||ws.readyState!==1) return;
+  if (!activeDevice) { alert('Selecciona un dispositivo'); return; }
+  ws.send(JSON.stringify({type:'cmd',action,deviceId:activeDevice,...extra}));
 }
 
 function startStream(type) {
   stopAllStreams();
-  if (type === 'screen') {
+  if (type==='screen') {
     cmd('screen_start');
-    screenInt = setInterval(() => cmd('screen_frame'), 250);
-  } else if (type === 'cam_front') {
-    cmd('cam_start', { lens:1 });
-    camInt = setInterval(() => cmd('cam_frame'), 250);
-  } else if (type === 'cam_back') {
-    cmd('cam_start', { lens:0 });
-    camInt = setInterval(() => cmd('cam_frame'), 250);
+    screenInt = setInterval(()=>cmd('screen_frame'), 250);
+  } else if (type==='cam_front') {
+    cmd('cam_start',{lens:1});
+    camInt = setInterval(()=>cmd('cam_frame'), 250);
+  } else if (type==='cam_back') {
+    cmd('cam_start',{lens:0});
+    camInt = setInterval(()=>cmd('cam_frame'), 250);
   }
 }
 
 function stopStream(type) {
   stopAllStreams();
-  if (type === 'screen') { cmd('screen_stop'); document.getElementById('screenArea').innerHTML='<div class="no-signal">🖥️<br>Stream detenido</div>'; }
-  if (type === 'camera') { cmd('cam_stop');    document.getElementById('cameraArea').innerHTML='<div class="no-signal">📷<br>Stream detenido</div>'; }
+  const area = type==='screen'?'screenArea':'cameraArea';
+  const label = type==='screen'?'🖥️ Stream detenido':'📷 Stream detenido';
+  document.getElementById(area).innerHTML=`<div class="nosig">${label}</div>`;
+  cmd(type==='screen'?'screen_stop':'cam_stop');
 }
 
 function stopAllStreams() {
   clearInterval(screenInt); clearInterval(camInt);
-  screenInt = null; camInt = null;
+  screenInt=null; camInt=null;
 }
 
-function listFiles(path) { cmd('list_files', { path }); }
+function listFiles(path) { cmd('list_files',{path}); }
 
-// ── Renderizado ───────────────────────────────────────────────────────────────
 function renderFiles(files) {
   const el = document.getElementById('fileList');
   if (!files?.length) { el.innerHTML='<div class="empty"><span style="font-size:36px">📭</span>Carpeta vacía</div>'; return; }
-  el.innerHTML = files.map(f=>`
-    <div class="file" onclick="${f.isDir?`listFiles('${f.path}')`:`cmd('download',{path:'${f.path}'})`}">
-      <span style="font-size:17px">${f.isDir?'📁':icon(f.name)}</span>
-      <span class="fname">${f.name}</span>
-      <span class="fsize">${f.isDir?'':fmt(f.size)}</span>
-    </div>`).join('');
+  el.innerHTML = files.map(f => {
+    const isImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(f.name);
+    const thumbHtml = f.isDir
+      ? `<div class="ficon">📁</div>`
+      : isImg
+        ? `<img class="thumb" id="th_${btoa(f.path).slice(0,12)}" src="" onerror="this.style.display='none'" loading="lazy">`
+        : `<div class="ficon">${icon(f.name)}</div>`;
+    return `<div class="file" onclick="${f.isDir?`listFiles('${f.path.replace(/'/g,"\\'")}')`:''}" >
+      ${thumbHtml}
+      <div class="finfo">
+        <div class="fname">${f.name}</div>
+        <div class="fsize">${f.isDir?'Carpeta':fmt(f.size)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Pedir miniaturas para imágenes
+  files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp)$/i.test(f.name))
+    .slice(0,30) // max 30 miniaturas a la vez
+    .forEach(f => cmd('thumb',{path:f.path}));
+}
+
+function renderThumb(path, b64) {
+  const id = 'th_'+btoa(path).slice(0,12);
+  const el = document.getElementById(id);
+  if (el) el.src = 'data:image/jpeg;base64,'+b64;
 }
 
 function renderInfo(d) {
   if (!d) return;
-  document.getElementById('infoGrid').innerHTML = Object.entries(d).map(([k,v])=>`
-    <div class="card"><div class="clabel">${k}</div><div class="cval">${v}</div></div>`).join('');
+  document.getElementById('infoGrid').innerHTML = Object.entries(d).map(([k,v])=>
+    `<div class="card"><div class="clabel">${k}</div><div class="cval">${v}</div></div>`).join('');
 }
 
+function addDevice(id) {
+  if (!id) return;
+  if (!devices[id]) devices[id] = {color:COLORS[colorIdx++%COLORS.length],online:true};
+  else devices[id].online = true;
+  if (!activeDevice) selectDevice(id);
+  renderDevBar();
+}
+function setOffline(id) { if(devices[id]){devices[id].online=false;renderDevBar();} }
+function selectDevice(id) {
+  activeDevice=id; stopAllStreams(); renderDevBar();
+  document.getElementById('screenArea').innerHTML='<div class="nosig">🖥️<br>Pulsa ▶ Iniciar</div>';
+  document.getElementById('cameraArea').innerHTML='<div class="nosig">📷<br>Elige cámara</div>';
+}
+function renderDevBar() {
+  const c=document.getElementById('devCards');
+  const ids=Object.keys(devices);
+  if (!ids.length){c.innerHTML='<span style="font-size:12px;color:#4B5563">Esperando...</span>';return;}
+  c.innerHTML=ids.map(id=>{
+    const d=devices[id];
+    return `<div class="dcard ${id===activeDevice?'active':''} ${d.online?'':'offline'}" onclick="selectDevice('${id}')">
+      <div class="davatar" style="background:${d.color};color:#fff">${id.slice(0,2).toUpperCase()}</div>
+      <div class="dname">${id.slice(0,8)}</div>
+      <div class="dping ${d.online?'on':'off'}">${d.online?'● Online':'● Offline'}</div>
+    </div>`;
+  }).join('');
+}
 function showTab(name) {
-  document.querySelectorAll('.tab').forEach((t,i)=>
-    t.classList.toggle('active',['screen','camera','files','info'][i]===name));
+  document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',['screen','camera','files','info'][i]===name));
   document.querySelectorAll('.panel').forEach(p=>p.classList.remove('active'));
   document.getElementById('panel'+name[0].toUpperCase()+name.slice(1))?.classList.add('active');
   stopAllStreams();
-  if (name==='info') cmd('info');
+  if(name==='info') cmd('info');
 }
-
-function setRelayStatus(on) {
-  const el = document.getElementById('relayStatus');
-  el.textContent = on ? '● Conectado' : '● Desconectado';
-  el.className = 'relay-status ' + (on?'on':'off');
-}
-
-function icon(n) {
-  if (/\.(jpg|jpeg|png|gif|webp)$/i.test(n)) return '🖼️';
-  if (/\.(mp4|mov|avi|mkv)$/i.test(n)) return '🎬';
-  if (/\.(mp3|aac|wav)$/i.test(n)) return '🎵';
-  if (/\.pdf$/i.test(n)) return '📄';
-  if (/\.apk$/i.test(n)) return '📦';
-  return '📄';
-}
-function fmt(b) {
-  if (!b) return '';
-  if (b>1e9) return (b/1e9).toFixed(1)+'GB';
-  if (b>1e6) return (b/1e6).toFixed(1)+'MB';
-  if (b>1e3) return (b/1e3).toFixed(0)+'KB';
-  return b+'B';
-}
+function setRS(on){const e=document.getElementById('relayStatus');e.textContent=on?'● Conectado':'● Desconectado';e.className='rs '+(on?'on':'off');}
+function icon(n){if(/\.(mp4|mov|avi|mkv)$/i.test(n))return'🎬';if(/\.(mp3|aac|wav)$/i.test(n))return'🎵';if(/\.pdf$/i.test(n))return'📄';if(/\.apk$/i.test(n))return'📦';return'📄';}
+function fmt(b){if(!b)return'';if(b>1e9)return(b/1e9).toFixed(1)+'GB';if(b>1e6)return(b/1e6).toFixed(1)+'MB';if(b>1e3)return(b/1e3).toFixed(0)+'KB';return b+'B';}
+function btoa(s){try{return window.btoa(unescape(encodeURIComponent(s)))}catch(e){return s.slice(-12)}}
 
 connect();
 </script>
