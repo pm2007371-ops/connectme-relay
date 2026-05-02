@@ -257,13 +257,13 @@ function renderGrid(files,el){
     </div>`;
   }).join('');
 
-  // Pedir miniaturas de imágenes que no están en caché
-  files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name))
-       .slice(0,40)
-       .forEach(f=>{
-         const reqId=hashPath(f.path);
-         if(!thumbCache[reqId]) cmd('thumb',{path:f.path,reqId});
-       });
+  // Pedir miniaturas de imágenes que no están en caché — de 5 en 5 con delay
+  const imgs = files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name))
+                    .slice(0,20);
+  imgs.forEach((f,i)=>{
+    const reqId=hashPath(f.path);
+    if(!thumbCache[reqId]) setTimeout(()=>cmd('thumb',{path:f.path,reqId}), i*150);
+  });
 }
 
 function renderList(files,el){
@@ -285,9 +285,9 @@ function renderList(files,el){
     </div>`;
   }).join('');
   files.filter(f=>!f.isDir&&/\.(jpg|jpeg|png|gif|webp|bmp)$/i.test(f.name))
-       .slice(0,40).forEach(f=>{
+       .slice(0,20).forEach((f,i)=>{
          const reqId=hashPath(f.path);
-         if(!thumbCache[reqId]) cmd('thumb',{path:f.path,reqId});
+         if(!thumbCache[reqId]) setTimeout(()=>cmd("thumb",{path:f.path,reqId}),i*150);
        });
 }
 
